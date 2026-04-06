@@ -19,11 +19,11 @@ Tene is an open-source, local-first secret management tool built in Go, designed
 ## Quick Start
 
 ```bash
-# Install
-go install github.com/tomo-kay/tene/cmd/tene@latest
-
-# Or download from GitHub Releases
+# Download binary from GitHub Releases
 # https://github.com/tomo-kay/tene/releases
+
+# Or with Go
+go install github.com/tomo-kay/tene/cmd/tene@latest
 
 # Then
 tene init

@@ -4,8 +4,8 @@ const steps = [
   {
     step: "01",
     title: "Install",
-    command: "go install github.com/tomo-kay/tene/cmd/tene@latest",
-    description: "One command. No account creation, no API keys, no server setup. Or download from GitHub Releases.",
+    command: "tene version",
+    description: "Download from GitHub Releases or run go install. Single binary, no runtime needed. No account, no server.",
   },
   {
     step: "02",

@@ -107,7 +107,7 @@ const jsonLd = {
         {
           "@type": "HowToStep",
           name: "Install",
-          text: "Run go install github.com/tomo-kay/tene/cmd/tene@latest or download from GitHub Releases.",
+          text: "Download the binary from GitHub Releases (github.com/tomo-kay/tene/releases) or run: go install github.com/tomo-kay/tene/cmd/tene@latest",
         },
         {
           "@type": "HowToStep",

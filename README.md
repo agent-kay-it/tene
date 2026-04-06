@@ -16,16 +16,30 @@ When you run `tene init`, it generates a `CLAUDE.md` file so Claude Code automat
 
 ## Install
 
+### Download binary (recommended)
+
+Download the latest binary for your platform from [GitHub Releases](https://github.com/tomo-kay/tene/releases).
+
 ```bash
-# Go users (recommended)
+# macOS / Linux — extract and move to PATH
+tar xzf tene_*.tar.gz
+sudo mv tene /usr/local/bin/
+```
+
+### With Go
+
+```bash
 go install github.com/tomo-kay/tene/cmd/tene@latest
+# Binary is installed to $(go env GOPATH)/bin/tene
+# Make sure $(go env GOPATH)/bin is in your PATH
+```
 
-# Or download binary from GitHub Releases
-# https://github.com/tomo-kay/tene/releases
+### Build from source
 
-# Or build from source
+```bash
 git clone https://github.com/tomo-kay/tene.git
 cd tene && go build -o tene ./cmd/tene
+sudo mv tene /usr/local/bin/
 ```
 
 ## Quick Start

@@ -26,7 +26,14 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:mt-10 sm:flex-row sm:justify-center">
-          <CopyCommand command="go install github.com/tomo-kay/tene/cmd/tene@latest" className="relative w-full justify-center sm:w-auto" />
+          <a
+            href="https://github.com/tomo-kay/tene/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-accent-dim sm:w-auto"
+          >
+            Download for free
+          </a>
 
           <a
             href="https://github.com/tomo-kay/tene"
