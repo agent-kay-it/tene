@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -46,21 +45,3 @@ func colorYellow_(text string) string { return colorize(colorYellow, text) }
 func colorBlue_(text string) string   { return colorize(colorBlue, text) }
 func colorBold_(text string) string   { return colorize(colorBold, text) }
 func colorDim_(text string) string    { return colorize(colorDim, text) }
-
-// printSuccess outputs a success message.
-func printSuccess(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	fmt.Println(colorGreen_(msg))
-}
-
-// printWarning outputs a warning message to stderr.
-func printWarning(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	fmt.Fprintf(os.Stderr, "%s\n", colorYellow_(msg))
-}
-
-// printError_ outputs an error message to stderr.
-func printError_(format string, args ...any) {
-	msg := fmt.Sprintf(format, args...)
-	fmt.Fprintf(os.Stderr, "%s\n", colorRed_(msg))
-}
