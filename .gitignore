@@ -8,3 +8,4 @@ dist/
 .claude/
 .DS_Store
 .next/
+bin/

@@ -1,0 +1,51 @@
+package keychain
+
+import (
+	"encoding/base64"
+	"os"
+	"path/filepath"
+)
+
+// FileStore is a file-based fallback KeyStore for environments where the OS keychain
+// is unavailable (CI, Docker, headless servers).
+type FileStore struct {
+	path string
+}
+
+// NewFileStore creates a new file-based KeyStore.
+func NewFileStore(path string) *FileStore {
+	return &FileStore{path: path}
+}
+
+func (f *FileStore) Store(key []byte) error {
+	dir := filepath.Dir(f.path)
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return err
+	}
+	encoded := base64.StdEncoding.EncodeToString(key)
+	return os.WriteFile(f.path, []byte(encoded), 0600)
+}
+
+func (f *FileStore) Load() ([]byte, error) {
+	data, err := os.ReadFile(f.path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, ErrKeyNotFound
+		}
+		return nil, err
+	}
+	return base64.StdEncoding.DecodeString(string(data))
+}
+
+func (f *FileStore) Delete() error {
+	err := os.Remove(f.path)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	return err
+}
+
+func (f *FileStore) Exists() bool {
+	_, err := os.Stat(f.path)
+	return err == nil
+}

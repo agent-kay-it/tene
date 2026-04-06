@@ -1,0 +1,70 @@
+package cli
+
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
+
+var deleteFlagForce bool
+
+var deleteCmd = &cobra.Command{
+	Use:   "delete KEY",
+	Short: "Delete a secret",
+	Args:  cobra.ExactArgs(1),
+	RunE:  runDelete,
+}
+
+func init() {
+	deleteCmd.Flags().BoolVar(&deleteFlagForce, "force", false, "Skip confirmation prompt")
+}
+
+func runDelete(cmd *cobra.Command, args []string) error {
+	keyName := args[0]
+
+	app, err := loadApp()
+	if err != nil {
+		return err
+	}
+	defer app.Vault.Close()
+
+	env := resolveEnv(app)
+
+	// Check if secret exists
+	exists, err := app.Vault.SecretExists(keyName, env)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf("Secret %q not found in %q environment.", keyName, env)
+	}
+
+	// Confirm
+	if !deleteFlagForce {
+		msg := fmt.Sprintf("Delete secret %q from %q?", keyName, env)
+		if !promptConfirm(msg) {
+			if !flagQuiet {
+				fmt.Println("Cancelled.")
+			}
+			return nil
+		}
+	}
+
+	if err := app.Vault.DeleteSecret(keyName, env); err != nil {
+		return err
+	}
+
+	if flagJSON {
+		return printJSON(map[string]any{
+			"ok":          true,
+			"name":        keyName,
+			"environment": env,
+			"deleted":     true,
+		})
+	}
+
+	if !flagQuiet {
+		fmt.Printf("%s deleted.\n", keyName)
+	}
+	return nil
+}

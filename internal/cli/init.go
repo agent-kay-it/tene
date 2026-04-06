@@ -1,0 +1,213 @@
+package cli
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/tomo-kay/tene/internal/claudemd"
+	"github.com/tomo-kay/tene/internal/crypto"
+	"github.com/tomo-kay/tene/internal/keychain"
+	"github.com/tomo-kay/tene/internal/recovery"
+	"github.com/tomo-kay/tene/internal/vault"
+)
+
+var initCmd = &cobra.Command{
+	Use:   "init [project-name]",
+	Short: "Initialize a new tene vault in the current project",
+	Args:  cobra.MaximumNArgs(1),
+	RunE:  runInit,
+}
+
+func runInit(cmd *cobra.Command, args []string) error {
+	dir := resolveDir()
+
+	// Determine project name
+	projectName := filepath.Base(dir)
+	if len(args) > 0 {
+		projectName = args[0]
+	}
+
+	// 1. Check if already initialized
+	vaultPath := filepath.Join(dir, ".tene", "vault.db")
+	if fileExists(vaultPath) {
+		if flagJSON {
+			return printJSON(map[string]any{
+				"ok":      true,
+				"message": "already_initialized",
+			})
+		}
+		fmt.Println("Vault already exists. Use existing vault.")
+		return nil
+	}
+
+	// 2. Master Password input (2x confirm)
+	password, err := promptPasswordConfirm("Set your Master Password (used to encrypt all secrets):\nMaster Password: ")
+	if err != nil {
+		return err
+	}
+
+	// 3. Generate salt + KDF -> Master Key
+	salt, err := crypto.GenerateSalt()
+	if err != nil {
+		return err
+	}
+	masterKey, err := crypto.DeriveKey(password, salt)
+	if err != nil {
+		return err
+	}
+
+	// 4. Create .tene/ directory
+	teneDir := filepath.Join(dir, ".tene")
+	if err := os.MkdirAll(teneDir, 0700); err != nil {
+		return fmt.Errorf("Cannot create .tene/ directory: %w", err)
+	}
+
+	// 5. Create SQLite vault
+	v, err := vault.New(vaultPath)
+	if err != nil {
+		return err
+	}
+	defer v.Close()
+
+	// 6. Store metadata
+	v.SetMeta("schema_version", "1")
+	v.SetMeta("vault_version", "1")
+	v.SetMeta("created_at", time.Now().UTC().Format(time.RFC3339))
+	v.SetMeta("kdf_salt", encodeBase64(salt))
+	v.SetMeta("kdf_params", `{"time":3,"memory":65536,"threads":1,"keyLen":32}`)
+	v.SetMeta("project_name", projectName)
+
+	// 7. Generate Recovery Key
+	mnemonic, err := recovery.GenerateMnemonic()
+	if err != nil {
+		return err
+	}
+	blob, err := recovery.EncryptMasterKey(masterKey, mnemonic)
+	if err != nil {
+		return err
+	}
+	v.SetMeta("recovery_blob", encodeBase64(blob))
+
+	// 8. Create default environment
+	v.SetActiveEnvironment("default")
+
+	// 9. Store master key in keychain
+	var ks keychain.KeyStore
+	if flagNoKeychain {
+		home, _ := os.UserHomeDir()
+		ks = keychain.NewFileStore(filepath.Join(home, ".tene", "keyfile"))
+	} else {
+		ks = keychain.NewStore(dir)
+	}
+	if err := ks.Store(masterKey); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: could not store key in keychain: %v\n", err)
+	}
+
+	// 10. Create .tene/.gitignore
+	writeGitignore(filepath.Join(teneDir, ".gitignore"))
+
+	// 11. Add .tene/ to root .gitignore
+	addToRootGitignore(dir)
+
+	// 12. Generate CLAUDE.md
+	gen := claudemd.NewGenerator(dir)
+	claudeCreated, _ := gen.Generate()
+
+	// 13. Audit log
+	v.AddAuditLog("vault.init", "", "project="+projectName)
+
+	// 14. Output
+	if flagJSON {
+		return printJSON(map[string]any{
+			"ok":          true,
+			"project":     projectName,
+			"vault":       ".tene/vault.db",
+			"claudeMd":    "CLAUDE.md",
+			"recoveryKey": mnemonic,
+			"environment": "default",
+		})
+	}
+
+	if !flagQuiet {
+		fmt.Println()
+		fmt.Printf("  Created .tene/vault.db (local encrypted vault)\n")
+		fmt.Printf("  Added .tene/ to .gitignore\n")
+		fmt.Printf("  Master Key saved to OS Keychain\n")
+		if claudeCreated {
+			fmt.Printf("  Generated CLAUDE.md (Claude Code will auto-detect tene)\n")
+		}
+		fmt.Println()
+		fmt.Println("  Recovery Key (write this down and keep it safe!):")
+		fmt.Println("  +--------------------------------------------------+")
+		words := splitMnemonicWords(mnemonic)
+		if len(words) >= 12 {
+			fmt.Printf("  |   %-47s|\n", joinWords(words[:6]))
+			fmt.Printf("  |   %-47s|\n", joinWords(words[6:12]))
+		}
+		fmt.Println("  |                                                  |")
+		fmt.Println("  |   If you forget your Master Password,            |")
+		fmt.Println("  |   this is the ONLY way to recover.               |")
+		fmt.Println("  +--------------------------------------------------+")
+		fmt.Println()
+		fmt.Printf("  Project %q initialized.\n", projectName)
+		fmt.Println("  Default environment \"default\" created.")
+		fmt.Println()
+		fmt.Println("  Next: tene set KEY VALUE to add your first secret.")
+		fmt.Println()
+		fmt.Println("  Tip: No server needed. Your secrets stay on this device.")
+		fmt.Println("       Claude Code will automatically use tene.")
+	} else {
+		fmt.Println("Created .tene/vault.db")
+		fmt.Println("Generated CLAUDE.md")
+		fmt.Printf("Recovery Key: %s\n", mnemonic)
+	}
+
+	return nil
+}
+
+func splitMnemonicWords(mnemonic string) []string {
+	var words []string
+	for _, w := range splitString(mnemonic) {
+		if w != "" {
+			words = append(words, w)
+		}
+	}
+	return words
+}
+
+func splitString(s string) []string {
+	result := []string{}
+	current := ""
+	for _, c := range s {
+		if c == ' ' {
+			if current != "" {
+				result = append(result, current)
+				current = ""
+			}
+		} else {
+			current += string(c)
+		}
+	}
+	if current != "" {
+		result = append(result, current)
+	}
+	return result
+}
+
+func joinWords(words []string) string {
+	result := ""
+	for i, w := range words {
+		if i > 0 {
+			result += " "
+		}
+		result += w
+	}
+	return result
+}
+
+// Ensure json import is used
+var _ = json.Marshal
