@@ -1,13 +1,13 @@
-# Tene Market Research v3.1
-## AI Agent 자동 인식 관점의 경쟁 분석 + GitHub Secrets 차별점
+# Tene Market Research v4
+## Claude Code 전용 + Go CLI 관점의 경쟁 분석 + GitHub Secrets 차별점
 
-> v3.1 (2026-04-06) — 암호화 알고리즘 XChaCha20-Poly1305 통일
+> v4 (2026-04-06) — Go 언어 전환 + Claude Code 전용 MVP 반영
 > PM Agent: pm-research | Frameworks: Persona Development, Competitive Analysis, TAM/SAM/SOM, Customer Journey Map
-> Architecture: CLI Local-Only MVP ($0) → Cloud Phase 2 (수요 검증 후)
+> Architecture: Go CLI Local-Only MVP ($0) → Cloud Phase 2 (수요 검증 후)
 
 ---
 
-## 1. 사용자 페르소나 (v3 — MVP 무료 전용)
+## 1. 사용자 페르소나 (v4 — MVP 무료 전용)
 
 ### Persona 1: "민지" — MVP 사용자 (솔로 바이브코더)
 
@@ -15,8 +15,8 @@
 |------|------|
 | **이름** | 김민지 |
 | **나이/직업** | 27세 / 프리랜서 풀스택 개발자 |
-| **기술 수준** | 중급. Claude Code + Cursor로 빠르게 프로토타입 제작 |
-| **사용 도구** | Claude Code, Cursor, Vercel, Supabase, Stripe |
+| **기술 수준** | 중급. Claude Code로 빠르게 프로토타입 제작 |
+| **사용 도구** | Claude Code, Vercel, Supabase, Stripe |
 | **관리 시크릿 수** | 5-15개 (API 키, DB URL, OAuth 토큰) |
 | **현재 방법** | .env 파일 + .gitignore |
 | **JTBD** | "서버 가입 없이 로컬에서 시크릿을 관리하고, AI가 자동으로 사용법을 아는 도구가 필요하다" |
@@ -25,9 +25,9 @@
 | **Trigger** | "tene init 하면 CLAUDE.md가 자동 생성되어 Claude Code가 바로 인식한다고?" |
 | **WTP (지불의향)** | **$0** — 무료 로컬이면 충분 |
 
-**핵심 시나리오**: 민지는 새 SaaS를 Claude Code로 만들고 있다. `npm install -g @tene/cli` → `tene init` → CLAUDE.md 자동 생성 → `tene set STRIPE_KEY sk_test_xxx` → `tene run -- cursor .`. Claude Code가 "이 프로젝트는 tene으로 시크릿을 관리합니다"를 자동 인식. 서버 가입? 없다.
+**핵심 시나리오**: 민지는 새 SaaS를 Claude Code로 만들고 있다. `brew install tomo-kay/tap/tene` → `tene init` → CLAUDE.md 자동 생성 → `tene set STRIPE_KEY sk_test_xxx` → `tene run -- claude`. Claude Code가 "이 프로젝트는 tene으로 시크릿을 관리합니다"를 자동 인식. 서버 가입? 없다. Node.js 설치? 불필요.
 
-**민지가 Tene를 선택하는 이유**: "AI가 알아서 인식하네? 가입도 없고? 이게 왜 이제야 나왔지?"
+**민지가 Tene를 선택하는 이유**: "brew install 한 줄이면 끝? AI가 알아서 인식하네? 가입도 없고? 이게 왜 이제야 나왔지?"
 
 ---
 
@@ -62,23 +62,24 @@
 
 ---
 
-## 2. 경쟁 제품 분석 (v3 — AI Agent 자동 인식 + GitHub Secrets 차별점)
+## 2. 경쟁 제품 분석 (v4 — Claude Code 자동 인식 + GitHub Secrets 차별점)
 
 ### 2.1 경쟁사 비교: AI Agent 통합 관점
 
-| 항목 | Tene v3 | Vault | Doppler | Infisical | 1Password | Dotenvx | GitHub Secrets |
+| 항목 | Tene v4 | Vault | Doppler | Infisical | 1Password | Dotenvx | GitHub Secrets |
 |------|:-------:|:-----:|:-------:|:---------:|:---------:|:-------:|:-------------:|
 | **AI Agent 자동 인식** | **Yes** | No | No | No | No | No | No |
 | **CLAUDE.md 생성** | **Yes** | No | No | No | No | No | No |
-| **.cursorrules 통합** | **Yes** | No | No | No | No | No | No |
 | **서버 필요** | **No** | Yes | Yes | Yes | Yes | Partial | Yes |
 | **가입 필요** | **No** | Yes | Yes | Yes | Yes | No | Yes |
 | **오프라인 동작** | **100%** | No | No | No | No | Yes | No |
 | **무료 플랜** | **무제한** | 셀프호스팅 | 3인/3프로젝트 | 셀프호스팅 | 없음 | CLI 무료 | Repo별 제한 |
 | **오픈소스** | **Yes (MIT)** | Partial (BSL) | No | Yes (MIT) | No | Yes | No |
+| **단일 바이너리** | **Yes (Go)** | Yes (Go) | No | No | No | Yes | N/A |
+| **런타임 의존성** | **없음** | 없음 | Node.js | Node.js | 없음 | Node.js | N/A |
 | **용도** | **로컬 개발 + AI** | 인프라 | 환경 동기화 | DevOps | 패스워드 | .env 암호화 | **CI/CD** |
 
-### 2.2 GitHub Secrets과의 차별점 (v3 핵심)
+### 2.2 GitHub Secrets과의 차별점 (v4 핵심)
 
 | 비교 | GitHub Secrets | Tene |
 |------|:-------------:|:----:|
@@ -98,7 +99,7 @@
 
 | 제품 | AI Agent 통합 방식 | 자동 인식 | 설정 필요 | Tene 대비 |
 |------|-------------------|:---------:|----------|----------|
-| **Tene v3** | CLAUDE.md / .cursorrules 자동 생성 | **Yes** | **없음** | 기준 |
+| **Tene v4** | CLAUDE.md 자동 생성 | **Yes** | **없음** | 기준 |
 | 1Password | Unified Access SDK/API | No | SDK 통합 | 설정 복잡 |
 | Infisical | Agent Sentinel (MCP) | No | MCP 설정 | MCP 설정 필요 |
 | Dotenvx | AS2 (ECIES ID) | No | CLI 학습 | 자동 인식 없음 |
@@ -108,7 +109,7 @@
 
 **핵심 인사이트**: AI 에이전트 "자동 인식"을 제공하는 시크릿 관리 도구는 Tene가 유일하다. 다른 모든 도구는 수동 설정(SDK, MCP, CLI 학습)이 필요하다.
 
-### 2.4 경쟁사별 심층 분석 (v3)
+### 2.4 경쟁사별 심층 분석 (v4)
 
 #### (1) 1Password Unified Access (2026년 3월 출시)
 
@@ -118,32 +119,34 @@
 - Discover → Secure → Audit 3단계 프레임워크
 - 런타임 자격증명 스코핑 2026년 하반기 출시 예정
 
-**Tene v3 vs 1Password**:
-| 비교 | 1Password | Tene v3 |
+**Tene v4 vs 1Password**:
+| 비교 | 1Password | Tene v4 |
 |------|-----------|---------|
 | AI 자동 인식 | No (SDK 필요) | **Yes (CLAUDE.md)** |
 | 서버 | 필수 (클라우드) | 불필요 (로컬) |
 | 가격 | $7.99/유저/월~ | $0 (무료) |
 | 타겟 | 엔터프라이즈 | 솔로 바이브코더 |
+| 설치 | 앱 설치 + 가입 | `brew install` 한 줄 |
 
 **결론**: 타겟이 다르다. 1Password = 엔터프라이즈, Tene = 개인/솔로.
 
 #### (2) Dotenvx AS2 (Agentic Secret Storage)
 
-**Tene v3 vs Dotenvx**:
-| 비교 | Dotenvx AS2 | Tene v3 |
+**Tene v4 vs Dotenvx**:
+| 비교 | Dotenvx AS2 | Tene v4 |
 |------|------------|---------|
 | AI 자동 인식 | No | **Yes (CLAUDE.md)** |
 | 저장 방식 | 암호화된 .env 파일 | SQLite 볼트 |
 | 환경 관리 | .env.dev, .env.prod 파일 분리 | `tene env dev/prod` 명령어 |
+| 언어 | Node.js | **Go (단일 바이너리)** |
 | 가격 | CLI 무료, 클라우드 미공개 | CLI 무료, Cloud 수요 확인 후 |
 
 **결론**: Dotenvx는 .env의 진화. Tene은 .env의 대체 + AI 자동 인식.
 
 #### (3) Infisical + Agent Sentinel
 
-**Tene v3 vs Infisical**:
-| 비교 | Infisical | Tene v3 |
+**Tene v4 vs Infisical**:
+| 비교 | Infisical | Tene v4 |
 |------|-----------|---------|
 | AI 통합 | MCP (Agent Sentinel) | **CLAUDE.md 자동 인식** |
 | 서버 | 필수 | 불필요 |
@@ -182,9 +185,9 @@ SAM = 2.16M (잠재 사용자 수)
 
 **Phase 1 (첫 12개월) 현실적 목표:**
 ```
-목표: npm 설치 50,000 / 활성 사용자 10,000
+목표: 설치 50,000 / 활성 사용자 10,000
 지역: 한국 + 영어권 바이브코더 커뮤니티
-획득 경로: GitHub 오픈소스, DevRel, npm, 입소문
+획득 경로: GitHub 오픈소스, DevRel, Homebrew, 입소문
 
 SOM = 10,000 활성 사용자 (Year 1)
 수익: $0 (MVP 무료)
@@ -199,7 +202,7 @@ waitlist 반응에 따라:
 
 ---
 
-## 4. Customer Journey Map (v3 — AI Agent 자동 인식 여정)
+## 4. Customer Journey Map (v4 — Claude Code 자동 인식 여정)
 
 ### Primary Persona: 김민지 (무료 MVP 여정)
 
@@ -207,29 +210,30 @@ waitlist 반응에 따라:
 단계     인지          설치          AI 자동인식      습관화          수요 검증
 ----------------------------------------------------------------------
 
-접점     X/Twitter     npm           CLAUDE.md       매일 tene run   tene sync
-         Reddit        GitHub        .cursorrules    프로젝트 추가   Fake Door
-         GeekNews      README        Claude Code     시크릿 축적     waitlist
+접점     X/Twitter     brew          CLAUDE.md       매일 tene run   tene sync
+         Reddit        curl          Claude Code     프로젝트 추가   Fake Door
+         GeekNews      GitHub        (자동 읽기)     시크릿 축적     waitlist
 
-행동     "AI가 자동    npm install   tene init       tene set       $ tene sync
-         인식하는      -g tene       → CLAUDE.md     tene run --    → "waitlist
-         시크릿 관리?  tene init     자동 생성!      cursor .       등록하세요"
-         무료?"                      "AI가 바로      (매일 반복)
-                                     인식하네!"
+행동     "AI가 자동    brew install  tene init       tene set       $ tene sync
+         인식하는      tomo-kay/     → CLAUDE.md     tene run --    → "waitlist
+         시크릿 관리?  tap/tene      자동 생성!      claude         등록하세요"
+         무료?        (~5초)        "AI가 바로      (매일 반복)
+         Node.js                     인식하네!"
+         불필요?"
 
 감정     호기심        놀라움        감탄            편안함          "Cloud
-         "진짜?       "가입이       "이건 다른     "이제 .env     있으면 좋겠는데"
-         무료?"       없다!"        도구에 없는    안 쓴다"       또는 "이대로
-                                     기능이네"                     충분해"
+         "진짜?       "5초 설치?   "이건 다른     "이제 .env     있으면 좋겠는데"
+         무료?"       Node.js도    도구에 없는    안 쓴다"       또는 "이대로
+                      불필요?"     기능이네"                     충분해"
 ```
 
-### 핵심 전환 지점 (Moment of Truth) — v3
+### 핵심 전환 지점 (Moment of Truth) — v4
 
 | # | 전환 지점 | 성공 기준 | 실패 시나리오 |
 |---|-----------|----------|--------------|
-| **MoT1** | 첫 설치 → 첫 시크릿 저장 | **3분 이내, 가입 없이** | "가입이 필요하네?" → 이탈 |
-| **MoT2** | **CLAUDE.md 생성 → AI 자동 인식** | "AI가 tene을 바로 알아보네!" | "CLAUDE.md가 뭐지?" |
-| **MoT3** | 첫 `tene run` 경험 | "와, .env 없이 되네!" | ".env랑 뭐가 다르지?" |
+| **MoT1** | 첫 설치 → 첫 시크릿 저장 | **1분 이내, 가입 없이, brew 한 줄** | "Node.js가 필요하네?" → 이탈 |
+| **MoT2** | **CLAUDE.md 생성 → AI 자동 인식** | "Claude Code가 tene을 바로 알아보네!" | "CLAUDE.md가 뭐지?" |
+| **MoT3** | 첫 `tene run` 경험 | "와, .env 없이 되네! 빠르다!" | ".env랑 뭐가 다르지?" |
 | **MoT4** | 프로젝트 3개 이상 사용 | "시크릿이 한곳에 정리되네!" | "프로젝트마다 init 귀찮다" |
 | **MoT5** | `tene sync` Fake Door | waitlist 등록 | "Cloud 필요 없어" |
 
@@ -265,7 +269,7 @@ waitlist 반응에 따라:
 
 ---
 
-## 6. 한국 시장 특수성 (v3)
+## 6. 한국 시장 특수성 (v4)
 
 | 요인 | 설명 | Tene 기회 |
 |------|------|-----------|
@@ -274,9 +278,11 @@ waitlist 반응에 따라:
 | 보안 규제 | 개인정보보호법 강화 | "서버가 없다" = 규제 부담 감소 |
 | 커뮤니티 | GeekNews, Velog, Discord 활발 | 한국어 콘텐츠로 선점 |
 | Claude Code 채택 | 한국 개발자 Claude Code 사용 증가 | CLAUDE.md 자동 생성의 즉각적 가치 |
+| Homebrew 사용 | macOS 개발자 대다수가 Homebrew 사용 | `brew install` 한 줄 설치 → 높은 전환율 |
 
 ---
 
 *Analysis by pm-research agent | Sources: GitGuardian 2026, Mordor Intelligence, 1Password, Dotenvx, Infisical*
-*Architecture: Local-Only MVP ($0) + AI Agent 자동 인식*
+*Architecture: Go CLI Local-Only MVP ($0) + Claude Code 자동 인식*
+*Tech Stack: Go + cobra + modernc.org/sqlite + golang.org/x/crypto*
 *Data collected: 2026-04-06*

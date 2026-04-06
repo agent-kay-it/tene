@@ -21,12 +21,12 @@ export function Hero() {
         <p className="mx-auto mt-6 max-w-xl text-base text-muted leading-relaxed sm:text-lg">
           Encrypted secrets stored locally. No server, no signup.{" "}
           <span className="text-foreground">
-            AI agents auto-detect your secrets with a single command.
+            Claude Code auto-detects your secrets with a single command.
           </span>
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:mt-10 sm:flex-row sm:justify-center">
-          <CopyCommand command="npm install -g @tene/cli" className="relative w-full justify-center sm:w-auto" />
+          <CopyCommand command="brew install tomo-kay/tap/tene" className="relative w-full justify-center sm:w-auto" />
 
           <a
             href="https://github.com/tomo-kay/tene"

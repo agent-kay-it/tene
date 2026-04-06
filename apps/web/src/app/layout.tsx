@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tene — Secret management that AI agents understand",
   description:
-    "Local-first encrypted secret management CLI. AI agents auto-detect your secrets. No server, no signup, no cost.",
+    "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets. No server, no signup, no cost.",
   icons: {
     icon: "/favicon.svg",
     apple: "/favicon.svg",
@@ -46,7 +46,7 @@ const jsonLd = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS, Linux, Windows (WSL)",
       description:
-        "Local-first encrypted secret management CLI. AI agents auto-detect your secrets.",
+        "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets.",
       url: "https://tene.dev",
       offers: {
         "@type": "Offer",
@@ -68,10 +68,10 @@ const jsonLd = {
         },
         {
           "@type": "Question",
-          name: "How does AI agent auto-detection work?",
+          name: "How does Claude Code auto-detection work?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "When you run tene init, it generates a CLAUDE.md file in your project root. AI agents like Claude Code and Cursor read this file automatically and learn how to use tene to retrieve secrets.",
+            text: "When you run tene init, it generates a CLAUDE.md file in your project root. Claude Code reads this file automatically and learns how to use tene to retrieve secrets.",
           },
         },
         {
@@ -107,12 +107,12 @@ const jsonLd = {
         {
           "@type": "HowToStep",
           name: "Install",
-          text: "Run npm install -g @tene/cli to install the CLI globally.",
+          text: "Run brew install tomo-kay/tap/tene (macOS) or curl -fsSL https://tene.dev/install.sh | sh (Linux/WSL) to install the CLI.",
         },
         {
           "@type": "HowToStep",
           name: "Initialize",
-          text: "Run tene init to create an encrypted vault and generate CLAUDE.md for AI agents.",
+          text: "Run tene init to create an encrypted vault and generate CLAUDE.md for Claude Code.",
         },
         {
           "@type": "HowToStep",

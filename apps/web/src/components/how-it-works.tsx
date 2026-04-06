@@ -4,15 +4,15 @@ const steps = [
   {
     step: "01",
     title: "Install",
-    command: "npm install -g @tene/cli",
-    description: "One command. No account creation, no API keys, no server setup.",
+    command: "brew install tomo-kay/tap/tene",
+    description: "One command. No account creation, no API keys, no server setup. Single binary — no runtime needed.",
   },
   {
     step: "02",
     title: "Initialize",
     command: "tene init",
     description:
-      "Creates an encrypted vault, generates CLAUDE.md for AI agents, and issues a 12-word recovery key.",
+      "Creates an encrypted vault, generates CLAUDE.md for Claude Code, and issues a 12-word recovery key.",
   },
   {
     step: "03",
@@ -24,9 +24,9 @@ const steps = [
   {
     step: "04",
     title: "Develop with secrets",
-    command: "tene run -- cursor .",
+    command: "tene run -- claude",
     description:
-      "Injects all secrets as environment variables into any command. Your AI agent reads CLAUDE.md and knows the rest.",
+      "Injects all secrets as environment variables into any command. Claude Code reads CLAUDE.md and knows the rest.",
   },
 ];
 

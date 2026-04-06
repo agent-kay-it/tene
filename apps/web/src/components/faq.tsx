@@ -6,12 +6,17 @@ const faqs = [
   {
     question: "What is Tene?",
     answer:
-      "Tene is a local-first, encrypted secret management CLI. It stores your API keys, tokens, and credentials in an encrypted SQLite vault on your device. No server, no signup, no cloud dependency.",
+      "Tene is a local-first, encrypted secret management CLI built in Go. It stores your API keys, tokens, and credentials in an encrypted SQLite vault on your device. Single binary, no runtime needed, no server, no signup.",
   },
   {
-    question: "How does AI agent auto-detection work?",
+    question: "How does Claude Code auto-detection work?",
     answer:
-      "When you run tene init, it generates a CLAUDE.md file in your project root. AI agents like Claude Code and Cursor read this file automatically and learn how to use tene to retrieve secrets — no manual configuration needed.",
+      "When you run tene init, it generates a CLAUDE.md file in your project root. Claude Code reads this file automatically and learns how to use tene to retrieve secrets — no manual configuration needed.",
+  },
+  {
+    question: "How do I install Tene?",
+    answer:
+      "On macOS: brew install tomo-kay/tap/tene. On Linux or WSL: curl -fsSL https://tene.dev/install.sh | sh. Or if you have Go: go install github.com/tomo-kay/tene@latest. Single binary, no Node.js or other runtime required.",
   },
   {
     question: "Is Tene free?",

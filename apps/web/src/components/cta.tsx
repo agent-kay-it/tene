@@ -13,7 +13,7 @@ export function CTA() {
         </p>
 
         <div className="mt-8 flex justify-center">
-          <CopyCommand command="npm install -g @tene/cli" className="relative border-accent/30 text-xs sm:text-sm" />
+          <CopyCommand command="brew install tomo-kay/tap/tene" className="relative border-accent/30 text-xs sm:text-sm" />
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

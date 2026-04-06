@@ -1,72 +1,75 @@
-# MVP 범위 브레인스토밍 v3.1
-## Cloud 제외, Fake Door Test, AI Agent 자동 인식
+# MVP 범위 브레인스토밍 v4
+## Go CLI + Claude Code 전용, Cloud 제외, Fake Door Test
 
-> v3.1 (2026-04-06) — 암호화 알고리즘 XChaCha20-Poly1305 통일
-> 목적: Cloud 제외된 MVP 최소 범위, Fake Door Test, AI Agent 자동 인식 기능 정의
+> v4 (2026-04-06) — Go 언어 전환 + Claude Code 전용 MVP 반영
+> 목적: Go CLI + Cloud 제외 + Claude Code 전용 MVP 최소 범위, Fake Door Test 정의
 
 ---
 
-## 1. MVP 철학: 서버 비용 $0, AI 에이전트가 자동 인식
+## 1. MVP 철학: Go 바이너리, 서버 비용 $0, Claude Code가 자동 인식
 
-### 1.1 핵심 질문 (v3)
+### 1.1 핵심 질문 (v4)
 
-> "솔로 바이브코더가 서버 가입 없이, npm install 하나로,
-> 3분 안에 '와, AI가 알아서 인식하네!'라고 느낄 수 있는 최소 기능은 무엇인가?"
+> "솔로 바이브코더가 서버 가입 없이, Node.js 없이, brew install 하나로,
+> 1분 안에 '와, Claude Code가 알아서 인식하네!'라고 느낄 수 있는 최소 기능은 무엇인가?"
 
-### 1.2 MVP 원칙 (v3)
+### 1.2 MVP 원칙 (v4)
 
-| 원칙 | v2 | v3 |
+| 원칙 | v3 | v4 |
 |------|----|----|
-| **One Job** | 서버 없이 시크릿 저장+주입 | 서버 없이 시크릿 저장+주입 + **AI 자동 인식** |
-| **3 Minute Magic** | 가입 없이 설치→사용 3분 | 가입 없이 설치→AI 인식→사용 3분 |
-| **No Server** | 서버 없음 (MVP) | 서버 없음 (MVP), **Cloud = Phase 2** |
-| **AI Native** | CLI Bash 호출 | **CLAUDE.md/.cursorrules 자동 생성** |
-| **Fake Door** | Cloud 전환 넛지 | **`tene sync` Fake Door (waitlist)** |
-| **Honest** | — | **못 하는 것 정직하게 명시** |
+| **One Job** | 서버 없이 시크릿 저장+주입 + AI 자동 인식 | 서버 없이 시크릿 저장+주입 + **Claude Code 자동 인식** |
+| **1 Minute Magic** | 가입 없이 설치→AI 인식→사용 3분 | 가입 없이 **brew 한 줄→AI 인식→사용 1분** |
+| **No Server** | 서버 없음 (MVP), Cloud = Phase 2 | 유지 |
+| **Zero Dependencies** | Node.js 런타임 필요 | **Go 단일 바이너리, 런타임 불필요** |
+| **AI Native** | CLAUDE.md/.cursorrules 자동 생성 | **CLAUDE.md만 (MVP), .cursorrules는 Phase 2** |
+| **Fake Door** | `tene sync` Fake Door (waitlist) | 유지 |
+| **Honest** | 못 하는 것 정직하게 명시 | 유지 |
 
-### 1.3 MVP = CLI + SQLite + @tene/crypto
+### 1.3 MVP = Go CLI + modernc.org/sqlite + golang.org/x/crypto
 
 ```
-npm install -g @tene/cli → tene init → tene set → tene run
+brew install tomo-kay/tap/tene → tene init → tene set → tene run
 ```
 
+- Go 단일 바이너리: ~10-15MB, ~5ms 시작, Node.js 불필요
 - 서버 없음, 회원가입 없음, 비용 없음
-- CLAUDE.md 자동 생성 (AI 자동 인식)
+- CLAUDE.md 자동 생성 (Claude Code 자동 인식)
 - `tene export --encrypted`로 수동 백업
 - `tene sync` = Fake Door (waitlist 안내만)
 
 ---
 
-## 2. MVP 기능 범위 (Cloud 완전 제외)
+## 2. MVP 기능 범위 (Cloud 완전 제외, Claude Code 전용)
 
-### Phase 1: Local MVP (서버 없음, 무료, $0)
+### Phase 1: Go CLI MVP (서버 없음, 무료, $0)
 
-**"서버 없이, 가입 없이, AI가 자동 인식하는 CLI"**
+**"서버 없이, 가입 없이, Claude Code가 자동 인식하는 Go CLI"**
 
 | # | 기능 | 명령어 | 우선순위 | 근거 |
 |---|------|--------|:--------:|------|
 | L1 | **프로젝트 초기화 + CLAUDE.md** | `tene init` | P0 | 볼트 생성 + **CLAUDE.md 자동 생성** |
-| L2 | **Cursor 통합** | `tene init --cursor` | P0 | **.cursorrules에 가이드 추가** |
-| L3 | **시크릿 저장** | `tene set KEY VALUE` | P0 | 핵심 가치의 시작점 |
-| L4 | **시크릿 조회** | `tene get KEY` | P0 | AI 에이전트 Bash 호출 핵심 |
-| L5 | **시크릿 주입** | `tene run -- CMD` | P0 | "한 줄이면 끝" 핵심 가치 |
-| L6 | **시크릿 목록** | `tene list` | P0 | 시크릿 현황 파악 |
-| L7 | **시크릿 삭제** | `tene delete KEY` | P0 | 기본 CRUD |
-| L8 | **.env 가져오기** | `tene import .env` | P1 | 전환 비용 제로 |
-| L9 | **.env 내보내기** | `tene export` | P1 | 기존 도구 호환성 |
-| L10 | **암호화 백업** | `tene export --encrypted` | P1 | Cloud 없이 수동 백업 |
-| L11 | **환경 전환** | `tene env [dev/prod]` | P1 | 개발/프로덕션 분리 |
-| L12 | **Fake Door** | `tene sync` | P1 | Cloud 수요 확인 (waitlist) |
-| L13 | **Master Password 암호화** | (내부) | P0 | 보안의 전제 조건 |
-| L14 | **Recovery Key 생성** | (내부) | P0 | 패스워드 분실 대비 |
-| L15 | **.gitignore 자동 추가** | (내부) | P0 | .tene/ 노출 방지 |
+| L2 | **시크릿 저장** | `tene set KEY VALUE` | P0 | 핵심 가치의 시작점 |
+| L3 | **시크릿 조회** | `tene get KEY` | P0 | AI 에이전트 Bash 호출 핵심 |
+| L4 | **시크릿 주입** | `tene run -- CMD` | P0 | "한 줄이면 끝" 핵심 가치 |
+| L5 | **시크릿 목록** | `tene list` | P0 | 시크릿 현황 파악 |
+| L6 | **시크릿 삭제** | `tene delete KEY` | P0 | 기본 CRUD |
+| L7 | **.env 가져오기** | `tene import .env` | P1 | 전환 비용 제로 |
+| L8 | **.env 내보내기** | `tene export` | P1 | 기존 도구 호환성 |
+| L9 | **암호화 백업** | `tene export --encrypted` | P1 | Cloud 없이 수동 백업 |
+| L10 | **환경 전환** | `tene env [dev/prod]` | P1 | 개발/프로덕션 분리 |
+| L11 | **Fake Door** | `tene sync` | P1 | Cloud 수요 확인 (waitlist) |
+| L12 | **Master Password 암호화** | (내부) | P0 | 보안의 전제 조건 |
+| L13 | **Recovery Key 생성** | (내부) | P0 | 패스워드 분실 대비 |
+| L14 | **.gitignore 자동 추가** | (내부) | P0 | .tene/ 노출 방지 |
 
-### Phase 2: Cloud (수요 검증 후)
+### Phase 2: 멀티 에디터 + Cloud (수요 검증 후)
 
-**"`tene sync` Fake Door에서 수요가 확인되면 구축"**
+**"Claude Code 외 AI 에디터 지원 + Cloud 동기화"**
 
 | # | 기능 | 설명 | 전제 조건 |
 |---|------|------|----------|
+| M1 | **Cursor 통합** | `tene init --cursor` (.cursorrules) | Claude Code MVP 성공 |
+| M2 | **Windsurf 통합** | `tene init --windsurf` (.windsurfrules) | Claude Code MVP 성공 |
 | C1 | Cloud 인증 | `tene login` | waitlist 100명+ |
 | C2 | 암호화 클라우드 백업 | 볼트 blob → S3 | waitlist 확인 |
 | C3 | 멀티 디바이스 동기화 | 자동 동기화 | waitlist 확인 |
@@ -92,35 +95,40 @@ npm install -g @tene/cli → tene init → tene set → tene run
 
 ### 3.1 "지금 만들면 안 되는" 기능
 
-**1. 클라우드 서버/API (Phase 2)**
+**1. Cursor/Windsurf 지원 (Phase 2)**
+- 이유: **Claude Code 전용으로 MVP 완성도를 높이는 것이 우선**
+- `--cursor`, `--windsurf` 플래그는 Phase 2에서 추가
+- MVP에서 CLAUDE.md 자동 생성의 가치가 검증되면 다른 에디터로 확장
+
+**2. 클라우드 서버/API (Phase 2)**
 - 이유: **수요 미확인 상태에서 서버 구축은 낭비**. Fake Door로 수요 먼저 확인
 - 대신: `tene sync` Fake Door + `tene export --encrypted` 수동 백업
 
-**2. 회원가입/로그인 (Phase 2)**
+**3. 회원가입/로그인 (Phase 2)**
 - 이유: **가입이 필요 없는 것이 핵심 차별점**
 - 대신: Phase 2 Cloud 가입 시에만
 
-**3. 웹 대시보드 (Phase 2)**
+**4. 웹 대시보드 (Phase 2)**
 - 이유: CLI로 핵심 가치 전달 가능
 - 대신: `tene list`, `tene export`로 CLI에서 관리
 
-**4. MCP 서버 (Phase 2)**
-- 이유: AI 에이전트는 **CLAUDE.md 자동 인식 + CLI Bash 호출**이면 충분
+**5. MCP 서버 (Phase 2)**
+- 이유: Claude Code는 **CLAUDE.md 자동 인식 + CLI Bash 호출**이면 충분
 - MCP 설정에 시크릿 저장하지 않아도 됨 → 오히려 보안적 이점
 
-**5. 자동 로테이션 (못 함)**
+**6. 자동 로테이션 (못 함)**
 - 이유: 각 서비스 API 개별 통합 필요, 구현 비용 매우 높음
 - 정직하게 "못 하는 것"으로 명시. Phase 2+ 가설
 
-**6. API key 만료 확인 (못 함)**
+**7. API key 만료 확인 (못 함)**
 - 이유: 서비스마다 만료 확인 API가 다르거나 없음
 - 정직하게 "못 하는 것"으로 명시
 
-**7. $1/월 Cloud ($1은 수요 확인 후)**
-- 이유: v2에서 $1/월 Cloud를 Phase 1.1에 계획했지만, **수요 미확인 상태에서 서버 구축은 리스크**
-- 대신: waitlist로 수요 확인 → 가격은 수요에 따라 결정
+**8. Node.js/npm 배포 (폐기)**
+- 이유: **Go 단일 바이너리가 모든 면에서 우수** (설치 속도, 시작 속도, 의존성, 보안)
+- 대신: Homebrew tap + curl 설치 + go install
 
-**8. 서버리스 인프라 (사용 안 함)**
+**9. 서버리스 인프라 (사용 안 함)**
 - 이유: 트래픽 늘면 비용 역전. ECS Fargate가 예측 가능
 - Phase 2 Cloud 구축 시: ECS Fargate + NLB + RDS PostgreSQL + S3
 
@@ -128,18 +136,18 @@ npm install -g @tene/cli → tene init → tene set → tene run
 
 | # | 기능 | 이유 |
 |---|------|------|
-| H1 | **Master Password 세션 캐시** | 매 명령마다 패스워드 입력하면 사용 불가 |
-| H2 | **Recovery Key 생성** | Master Password 분실 시 유일한 복구 수단 |
-| H3 | **CLAUDE.md 자동 생성** | AI Agent 자동 인식의 핵심 메커니즘 |
+| H1 | **OS Keychain 세션 캐시** | 매 명령마다 패스워드 입력하면 사용 불가 (go-keyring) |
+| H2 | **Recovery Key 생성** | Master Password 분실 시 유일한 복구 수단 (go-bip39) |
+| H3 | **CLAUDE.md 자동 생성** | Claude Code 자동 인식의 핵심 메커니즘 |
 | H4 | **에러 메시지 품질** | "tene init으로 먼저 초기화하세요" |
 | H5 | **.gitignore 자동 추가** | .tene/ 노출 방지 |
 | H6 | **시크릿 값 마스킹** | `tene list`에서 값 마스킹 |
-| H7 | **빠른 응답** | < 200ms |
+| H7 | **빠른 응답** | ~5ms (Go 단일 바이너리의 자연스러운 장점) |
 | H8 | **Master Password 변경** | `tene passwd` 명령어 |
 
 ---
 
-## 4. AI Agent 자동 인식 기능 상세
+## 4. Claude Code 자동 인식 기능 상세
 
 ### 4.1 `tene init` → CLAUDE.md 자동 생성
 
@@ -173,14 +181,11 @@ This project uses [tene](https://github.com/agentkay/tene) for secret management
 - Use `tene list` to see available secrets
 ```
 
-### 4.2 `tene init --cursor` → .cursorrules 자동 추가
+### 4.2 Cursor/Windsurf 지원 (Phase 2)
 
-```
-$ tene init --cursor
-? Master Password: ********
-
-> .cursorrules에 tene 가이드 추가 완료
-```
+MVP에서는 Claude Code 전용에 집중한다:
+- `tene init --cursor` → Phase 2 (.cursorrules 자동 추가)
+- `tene init --windsurf` → Phase 2 (.windsurfrules 자동 추가)
 
 ### 4.3 기존 CLAUDE.md가 있는 경우
 
@@ -211,8 +216,8 @@ $ tene sync
 
 ```
 [Step 1] CLI 출시 → 기본 지표 추적
-   npm 다운로드 수, GitHub Stars
-   성공 기준: npm 주간 500+, Stars 1,000+
+   Homebrew/curl/go install 설치 수, GitHub Stars
+   성공 기준: 주간 설치 500+, Stars 1,000+
 
 [Step 2] tene sync Fake Door → Cloud 수요 확인
    tene sync 실행 → waitlist 페이지
@@ -225,15 +230,15 @@ $ tene sync
 
 ---
 
-## 6. Local MVP 핵심 플로우 상세
+## 6. Go CLI MVP 핵심 플로우 상세
 
-### 6.1 첫 사용 플로우 (3분 목표)
+### 6.1 첫 사용 플로우 (1분 목표)
 
 ```
-[0:00] $ npm install -g @tene/cli
-       > 설치 완료 (15초)
+[0:00] $ brew install tomo-kay/tap/tene
+       > tene installed (~5초, Node.js 불필요)
 
-[0:15] $ cd my-project
+[0:05] $ cd my-project
        $ tene init
        ? Master Password: ********
        ? Confirm Password: ********
@@ -241,23 +246,23 @@ $ tene sync
        > .gitignore에 .tene/ 추가
        > CLAUDE.md 생성 완료 (Claude Code 자동 인식)
        > Recovery Key: apple banana cherry ... (보관하세요!)
-       (30초)
+       (15초)
 
-[0:45] $ tene import .env
+[0:20] $ tene import .env
        > 5개 시크릿 가져오기 완료 (암호화)
-       (10초)
+       (5초)
 
-[0:55] $ tene run -- cursor .
+[0:25] $ tene run -- claude
        > 5 secrets injected as environment variables
-       > Starting: cursor .
-       (10초)
+       > Starting: claude
+       (5초)
 
-[1:05] 완료! 1분 5초 만에.
+[0:30] 완료! 30초 만에.
        Claude Code가 CLAUDE.md를 읽고 tene을 자동 인식.
-       서버 없음. 가입 없음. 비용 $0.
+       서버 없음. 가입 없음. Node.js 없음. 비용 $0.
 ```
 
-### 6.2 AI 에이전트 사용 플로우 (CLAUDE.md 자동 인식)
+### 6.2 Claude Code 사용 플로우 (CLAUDE.md 자동 인식)
 
 ```
 [Claude Code 세션 - CLAUDE.md가 있는 프로젝트]
@@ -293,47 +298,54 @@ $ tene import --encrypted ~/backup/my-project-20260406.enc
 
 ## 7. 기술적 MVP 범위
 
-### 7.1 CLI 아키텍처
+### 7.1 Go CLI 아키텍처
 
 ```
-packages/cli/
-+-- src/
-|   +-- commands/          # CLI 명령어
-|   |   +-- init.ts        # Master Password + 볼트 + CLAUDE.md 생성
-|   |   +-- set.ts         # 시크릿 암호화 저장
-|   |   +-- get.ts         # 시크릿 복호화 조회
-|   |   +-- run.ts         # 환경변수 주입 실행
-|   |   +-- list.ts        # 시크릿 목록 (마스킹)
-|   |   +-- delete.ts      # 시크릿 삭제
-|   |   +-- env.ts         # 환경 전환
-|   |   +-- import.ts      # .env / --encrypted 가져오기
-|   |   +-- export.ts      # .env / --encrypted 내보내기
-|   |   +-- recover.ts     # Recovery Key로 복구
-|   |   +-- passwd.ts      # Master Password 변경
-|   |   +-- sync.ts        # Fake Door Test (waitlist 안내)
-|   +-- crypto/            # @tene/crypto 암호화 모듈
-|   |   +-- encryption.ts  # XChaCha20-Poly1305
-|   |   +-- kdf.ts         # Argon2id
-|   |   +-- keys.ts        # Master Key, Recovery Key 관리
-|   +-- store/             # 로컬 저장소
-|   |   +-- vault.ts       # SQLite 볼트 관리
-|   |   +-- session.ts     # Master Password 세션 캐시
-|   +-- agent/             # AI Agent 통합
-|   |   +-- claude.ts      # CLAUDE.md 생성
-|   |   +-- cursor.ts      # .cursorrules 생성
-|   +-- utils/
-|       +-- config.ts      # 설정 관리
-|       +-- output.ts      # 출력 포맷팅
-+-- package.json
-+-- tsconfig.json
+cmd/tene/                  ← Go CLI 엔트리포인트
+  main.go
+internal/
+  commands/                ← cobra CLI 명령어
+    init.go                # Master Password + 볼트 + CLAUDE.md 생성
+    set.go                 # 시크릿 암호화 저장
+    get.go                 # 시크릿 복호화 조회
+    run.go                 # 환경변수 주입 실행
+    list.go                # 시크릿 목록 (마스킹)
+    delete.go              # 시크릿 삭제
+    env.go                 # 환경 전환
+    import.go              # .env / --encrypted 가져오기
+    export.go              # .env / --encrypted 내보내기
+    recover.go             # Recovery Key로 복구
+    passwd.go              # Master Password 변경
+    sync.go                # Fake Door Test (waitlist 안내)
+  crypto/                  ← 암호화 모듈
+    encryption.go          # XChaCha20-Poly1305 (golang.org/x/crypto/nacl/secretbox)
+    kdf.go                 # Argon2id (golang.org/x/crypto/argon2)
+    keys.go                # Master Key, Recovery Key 관리
+  vault/                   ← 로컬 저장소
+    sqlite.go              # SQLite 볼트 관리 (modernc.org/sqlite)
+    session.go             # OS Keychain 세션 캐시 (go-keyring)
+  claudemd/                ← Claude Code 통합
+    generate.go            # CLAUDE.md 생성
+  recovery/                ← 복구
+    bip39.go               # BIP-39 니모닉 (tyler-smith/go-bip39)
+  keychain/                ← OS Keychain 연동
+    keyring.go             # zalando/go-keyring
+apps/web/                  ← Next.js 랜딩페이지 (유지)
+go.mod
+go.sum
+.goreleaser.yml            ← goreleaser 멀티 플랫폼 빌드 설정
 ```
 
-**v2 대비 핵심 변경**:
-- `agent/` 모듈 추가 (CLAUDE.md, .cursorrules 생성)
-- `sync.ts` = Fake Door (waitlist 안내만)
-- `export.ts`에 `--encrypted` 옵션 추가
-- `sync/` 모듈 삭제 (Cloud는 Phase 2)
-- `login.ts` 삭제 (Phase 2)
+**v3 대비 핵심 변경**:
+- TypeScript → Go 전환
+- Commander.js → cobra
+- better-sqlite3 → modernc.org/sqlite (순수 Go, CGo 없음)
+- libsodium-wrappers → golang.org/x/crypto (네이티브 Go)
+- keytar → go-keyring
+- BIP-39 npm → go-bip39
+- npm publish → goreleaser (Homebrew tap + 멀티 플랫폼 바이너리)
+- `agent/cursor.ts` 삭제 → Phase 2
+- pnpm workspace → Go modules + apps/web (Next.js)
 
 ### 7.2 서버 API (Phase 2에서만, 서버리스 X)
 
@@ -342,13 +354,13 @@ packages/cli/
 
 ---
 
-## 8. MVP 성공 기준 (v3)
+## 8. MVP 성공 기준 (v4)
 
 ### 8.1 출시 후 30일 목표
 
 | 지표 | 목표 | 측정 |
 |------|------|------|
-| npm 설치 | 2,000+ | npm stats |
+| 설치 수 (brew+curl+go) | 2,000+ | GitHub Releases + Homebrew analytics |
 | GitHub Stars | 500+ | GitHub |
 | `tene sync` Fake Door 실행 | 100+ | (간접 추정) |
 
@@ -356,11 +368,11 @@ packages/cli/
 
 | 지표 | 목표 | 측정 |
 |------|------|------|
-| npm 총 설치 | 10,000+ | npm stats |
+| 총 설치 수 | 10,000+ | GitHub Releases |
 | GitHub Stars | 2,000+ | GitHub |
 | waitlist 등록 | 100+ | tene.dev/cloud |
 | Cloud 구축 결정 | Yes/No | waitlist 분석 |
 
 ---
 
-*Tene v3 Brainstorming Document 03/05*
+*Tene v4 Brainstorming Document 03/05*

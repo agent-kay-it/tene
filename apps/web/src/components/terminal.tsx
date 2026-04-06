@@ -10,12 +10,12 @@ export function Terminal() {
             <span className="ml-3 text-xs text-muted font-mono">~/my-project</span>
           </div>
           <div className="overflow-x-auto p-4 font-mono text-xs leading-7 sm:p-6 sm:text-sm">
-            <Line prompt>npm install -g @tene/cli</Line>
+            <Line prompt>brew install tomo-kay/tap/tene</Line>
             <Line />
             <Line prompt>tene init</Line>
             <Line dim>  Master Password: ********</Line>
             <Line green>  ✓ .tene/vault.db created</Line>
-            <Line green>  ✓ CLAUDE.md created — AI agents will auto-detect tene</Line>
+            <Line green>  ✓ CLAUDE.md created — Claude Code will auto-detect tene</Line>
             <Line green>  ✓ .tene/ added to .gitignore</Line>
             <Line />
             <Line dim>  Recovery Key:</Line>
@@ -28,9 +28,9 @@ export function Terminal() {
             <Line prompt>tene set OPENAI_API_KEY sk-proj-xxxxx</Line>
             <Line green>  ✓ OPENAI_API_KEY saved (encrypted)</Line>
             <Line />
-            <Line prompt>tene run -- cursor .</Line>
+            <Line prompt>tene run -- claude</Line>
             <Line green>  ✓ 2 secrets injected as environment variables</Line>
-            <Line green>  ✓ Starting: cursor .</Line>
+            <Line green>  ✓ Starting: claude</Line>
             <Line />
             <Line dim>  {"// Claude Code reads CLAUDE.md and knows:"}</Line>
             <Line dim>  {"// \"This project uses tene for secret management.\""}</Line>
