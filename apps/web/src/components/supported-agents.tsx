@@ -11,7 +11,7 @@ export function SupportedAgents() {
     <section className="px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-sm font-medium text-muted">
-          Works with your AI editor
+          Works with your AI Agents
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
           {agents.map((agent) => (
@@ -26,7 +26,7 @@ export function SupportedAgents() {
         </div>
         <p className="mt-4 text-xs text-muted">
           <code className="rounded bg-surface px-1.5 py-0.5 text-accent">tene init</code>
-          {" "}auto-generates context files for each editor
+          {" "}auto-generates context files for each agent
         </p>
       </div>
     </section>

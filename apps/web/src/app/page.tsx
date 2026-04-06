@@ -1,5 +1,4 @@
 import { Hero } from "@/components/hero";
-import { Terminal } from "@/components/terminal";
 import { Features } from "@/components/features";
 import { Comparison } from "@/components/comparison";
 import { HowItWorks } from "@/components/how-it-works";
@@ -10,7 +9,6 @@ import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
 import { FAQ } from "@/components/faq";
 import { InteractiveGrid } from "@/components/interactive-grid";
-import { SupportedAgents } from "@/components/supported-agents";
 
 export default function Home() {
   return (
@@ -24,8 +22,6 @@ export default function Home() {
       <Nav />
       <main className="relative z-10">
         <Hero />
-        <SupportedAgents />
-        <Terminal />
         <Features />
         <HowItWorks />
         <Security />
