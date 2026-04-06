@@ -1,15 +1,6 @@
-const rows = [
-  { feature: "Local-first", tene: true, env: true, doppler: false, vault: false, infisical: false },
-  { feature: "No server required", tene: true, env: true, doppler: false, vault: false, infisical: false },
-  { feature: "No signup required", tene: true, env: true, doppler: false, vault: false, infisical: false },
-  { feature: "Encrypted at rest", tene: true, env: false, doppler: true, vault: true, infisical: true },
-  { feature: "AI agent auto-detect", tene: true, env: false, doppler: false, vault: false, infisical: false },
-  { feature: "Environment injection", tene: true, env: false, doppler: true, vault: true, infisical: true },
-  { feature: "100% offline", tene: true, env: true, doppler: false, vault: false, infisical: false },
-  { feature: "Open source", tene: true, env: true, doppler: false, vault: false, infisical: true },
-  { feature: "Free", tene: true, env: true, doppler: false, vault: false, infisical: false },
-];
+import { comparisonRows, comparisonPricing } from "@/data/comparison";
 
+// Design Ref: §4.6 — Comparison table with data import, "Secrets hidden from AI" first
 function Check() {
   return (
     <svg className="h-5 w-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
@@ -34,7 +25,7 @@ export function Comparison() {
           How Tene compares
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-center text-muted">
-          Tene is the only tool that combines local-first encryption with AI agent auto-detection.
+          The only tool that hides secrets from AI agents while keeping everything local and free.
         </p>
 
         <div className="-mx-4 mt-12 overflow-x-auto px-4 sm:mx-0 sm:px-0">
@@ -50,7 +41,7 @@ export function Comparison() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {comparisonRows.map((row) => (
                 <tr key={row.feature} className="border-b border-border/50">
                   <td className="py-3 pr-4 whitespace-nowrap text-foreground">{row.feature}</td>
                   <td className="py-3 px-3 text-center sm:px-4">
@@ -72,11 +63,11 @@ export function Comparison() {
               ))}
               <tr>
                 <td className="pt-4 pr-4 text-muted">Price</td>
-                <td className="pt-4 px-3 text-center font-bold text-accent sm:px-4">$0</td>
-                <td className="pt-4 px-3 text-center text-muted sm:px-4">$0</td>
-                <td className="pt-4 px-3 text-center text-muted sm:px-4">$21/mo</td>
-                <td className="pt-4 px-3 text-center text-muted sm:px-4">$1,152+</td>
-                <td className="pt-4 px-3 text-center text-muted sm:px-4">$6/mo</td>
+                <td className="pt-4 px-3 text-center font-bold text-accent sm:px-4">{comparisonPricing.tene}</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">{comparisonPricing.env}</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">{comparisonPricing.doppler}</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">{comparisonPricing.vault}</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">{comparisonPricing.infisical}</td>
               </tr>
             </tbody>
           </table>

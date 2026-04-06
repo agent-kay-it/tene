@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 	"github.com/tomo-kay/tene/internal/keychain"
 	"github.com/tomo-kay/tene/internal/vault"
 	"golang.org/x/term"
@@ -108,7 +109,7 @@ func loadApp() (*App, error) {
 	vaultPath := filepath.Join(dir, ".tene", "vault.db")
 
 	if _, err := os.Stat(vaultPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Not in a Tene project. Run \"tene init\" first.")
+		return nil, teneerr.ErrVaultNotFound
 	}
 
 	v, err := vault.New(vaultPath)
@@ -153,7 +154,7 @@ func loadOrPromptMasterKey(app *App) ([]byte, error) {
 
 	// Interactive prompt
 	if !isTerminal() {
-		return nil, fmt.Errorf("Master key not found in keychain. Set TENE_MASTER_PASSWORD or use an interactive terminal.")
+		return nil, teneerr.ErrInteractiveRequired
 	}
 
 	fmt.Fprint(os.Stderr, "Enter Master Password: ")

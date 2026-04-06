@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 var (
@@ -39,11 +40,13 @@ func runExport(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(masterKey)
 
 	encKey, err := crypto.DeriveSubKey(masterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(encKey)
 
 	allSecrets, err := app.Vault.GetAllSecrets(env)
 	if err != nil {
@@ -64,12 +67,15 @@ func runExport(cmd *cobra.Command, args []string) error {
 		}
 		pt, err := crypto.Decrypt(encKey, ct, []byte(name))
 		if err != nil {
-			return fmt.Errorf("Failed to decrypt secrets.")
+			return teneerr.ErrDecryptFailed
 		}
 		decrypted[name] = string(pt)
 		sortedKeys = append(sortedKeys, name)
 	}
 	sort.Strings(sortedKeys)
+
+	// Audit log
+	_ = app.Vault.AddAuditLog("secrets.export", "", fmt.Sprintf("count=%d,env=%s,encrypted=%v", len(sortedKeys), env, exportFlagEncrypted))
 
 	if exportFlagEncrypted {
 		return exportEncrypted(app, env, sortedKeys, decrypted, encKey)

@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 var runCmd = &cobra.Command{
@@ -21,7 +22,7 @@ func runRun(cmd *cobra.Command, args []string) error {
 	// Parse args after "--"
 	cmdArgs := extractArgsAfterDash(args)
 	if len(cmdArgs) == 0 {
-		return fmt.Errorf("No command specified. Usage: tene run -- <command>")
+		return teneerr.New("COMMAND_NOT_FOUND", "No command specified. Usage: tene run -- <command>", 1)
 	}
 
 	app, err := loadApp()
@@ -34,11 +35,13 @@ func runRun(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(masterKey)
 
 	encKey, err := crypto.DeriveSubKey(masterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(encKey)
 
 	env := resolveEnv(app)
 	allSecrets, err := app.Vault.GetAllSecrets(env)
@@ -95,7 +98,7 @@ func runRun(cmd *cobra.Command, args []string) error {
 			os.Exit(exitErr.ExitCode())
 		}
 		if execErr, ok := err.(*exec.Error); ok {
-			return fmt.Errorf("Command %q not found.", execErr.Name)
+			return teneerr.ErrCommandNotFound(execErr.Name)
 		}
 		return err
 	}

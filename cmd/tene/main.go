@@ -6,6 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/tomo-kay/tene/internal/cli"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 // These are set via ldflags at build time (goreleaser).
@@ -54,7 +55,36 @@ func main() {
 	cli.SetVersion(version, commit, date)
 
 	if err := cli.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-		os.Exit(1)
+		exitCode := 1 // default exit code
+
+		if te, ok := teneerr.IsTeneError(err); ok {
+			exitCode = te.Exit
+
+			if hasJSONFlag() {
+				_ = te.WriteJSON(os.Stderr)
+			} else {
+				fmt.Fprintf(os.Stderr, "Error: %s\n", te.Message)
+			}
+		} else {
+			// Non-TeneError: plain error
+			if hasJSONFlag() {
+				fallback := teneerr.New("UNKNOWN_ERROR", err.Error(), 1)
+				_ = fallback.WriteJSON(os.Stderr)
+			} else {
+				fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+			}
+		}
+
+		os.Exit(exitCode)
 	}
+}
+
+// hasJSONFlag detects --json flag from os.Args before cobra parsing.
+func hasJSONFlag() bool {
+	for _, arg := range os.Args[1:] {
+		if arg == "--json" {
+			return true
+		}
+	}
+	return false
 }

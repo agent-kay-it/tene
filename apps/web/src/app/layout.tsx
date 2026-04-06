@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tene — Secret management that AI agents understand",
+  title: "Tene — Your .env is not a secret. AI can read it.",
   description:
-    "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets via CLAUDE.md. XChaCha20-Poly1305 encryption. No server, no signup, free and open source.",
+    "Your .env is not a secret — AI can read it. Tene encrypts secrets locally and injects them at runtime so AI agents never see the values. XChaCha20-Poly1305 encryption. No server, no signup, free and open source.",
   keywords: [
     "secret management",
     "API key management",
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     apple: "/favicon.svg",
   },
   openGraph: {
-    title: "Tene — Secret management that AI agents understand",
+    title: "Tene — Your .env is not a secret. AI can read it.",
     description:
-      "Local-first encrypted secret management CLI. Claude Code auto-detects your secrets. No server, no signup, free.",
+      "Tene encrypts secrets locally and injects them at runtime so AI agents never see the values. No server, no signup, free.",
     url: "https://tene.sh",
     siteName: "Tene",
     type: "website",
@@ -56,15 +56,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1437,
         height: 821,
-        alt: "Tene — Secret management that AI agents understand",
+        alt: "Tene — Your .env is not a secret. AI can read it.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tene — Secret management that AI agents understand",
+    title: "Tene — Your .env is not a secret. AI can read it.",
     description:
-      "Local-first encrypted secret management CLI. Claude Code auto-detects your secrets. No server, no signup, free.",
+      "Tene encrypts secrets locally and injects them at runtime so AI agents never see the values. No server, no signup, free.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -86,7 +86,7 @@ const jsonLd = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS, Linux, Windows (WSL)",
       description:
-        "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets.",
+        "Your .env is not a secret — AI can read it. Tene encrypts secrets locally and injects them at runtime so AI agents never see the values.",
       url: "https://tene.sh",
       offers: {
         "@type": "Offer",
@@ -147,7 +147,7 @@ const jsonLd = {
         {
           "@type": "HowToStep",
           name: "Install",
-          text: "Download the binary from GitHub Releases (github.com/tomo-kay/tene/releases) or run: go install github.com/tomo-kay/tene/cmd/tene@latest",
+          text: "Run: curl -sSfL https://tene.sh/install.sh | sh — or download from GitHub Releases (github.com/tomo-kay/tene/releases)",
         },
         {
           "@type": "HowToStep",

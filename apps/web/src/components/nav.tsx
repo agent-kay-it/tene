@@ -42,6 +42,9 @@ export function Nav() {
           <a href="#security" className="transition-colors hover:text-foreground">
             Security
           </a>
+          <a href="#pricing" className="transition-colors hover:text-foreground">
+            Pricing
+          </a>
           <a
             href="https://github.com/tomo-kay/tene"
             target="_blank"
@@ -109,6 +112,13 @@ export function Nav() {
               className="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-foreground"
             >
               Security
+            </a>
+            <a
+              href="#pricing"
+              onClick={() => setMenuOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-foreground"
+            >
+              Pricing
             </a>
             <a
               href="#faq"

@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 var (
@@ -42,11 +43,13 @@ func runImport(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(masterKey)
 
 	encKey, err := crypto.DeriveSubKey(masterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(encKey)
 
 	if importFlagEncrypted {
 		return importEncrypted(app, filePath, env, masterKey, encKey)
@@ -59,7 +62,7 @@ func importDotEnv(app *App, filePath, env string, encKey []byte) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return fmt.Errorf("File %q not found.", filePath)
+			return teneerr.ErrFileNotFound(filePath)
 		}
 		return err
 	}
@@ -82,7 +85,7 @@ func importDotEnv(app *App, filePath, env string, encKey []byte) error {
 
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			return fmt.Errorf("Failed to parse %q at line %d: invalid format.", filePath, lineNum)
+			return teneerr.ErrFileParse(filePath, lineNum, "invalid format")
 		}
 
 		key := strings.TrimSpace(parts[0])
@@ -128,6 +131,9 @@ func importDotEnv(app *App, filePath, env string, encKey []byte) error {
 		imported++
 	}
 
+	// Audit log
+	_ = app.Vault.AddAuditLog("secrets.import", filePath, fmt.Sprintf("count=%d,env=%s", imported, env))
+
 	if flagJSON {
 		return printJSON(map[string]any{
 			"ok":          true,
@@ -154,7 +160,7 @@ func importEncrypted(app *App, filePath, env string, masterKey, encKey []byte) e
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return fmt.Errorf("File %q not found.", filePath)
+			return teneerr.ErrFileNotFound(filePath)
 		}
 		return err
 	}
@@ -162,7 +168,7 @@ func importEncrypted(app *App, filePath, env string, masterKey, encKey []byte) e
 	// The encrypted backup is: encKey encrypted blob of KEY=VALUE pairs
 	plaintext, err := crypto.Decrypt(encKey, data, []byte("tene-export"))
 	if err != nil {
-		return fmt.Errorf("Failed to decrypt backup file. Wrong Master Password?")
+		return teneerr.ErrDecryptFailed
 	}
 
 	// Parse as .env format
@@ -189,6 +195,9 @@ func importEncrypted(app *App, filePath, env string, masterKey, encKey []byte) e
 		}
 		count++
 	}
+
+	// Audit log
+	_ = app.Vault.AddAuditLog("secrets.import", filePath, fmt.Sprintf("count=%d,env=%s,encrypted=true", count, env))
 
 	if !flagQuiet {
 		fmt.Printf("%d secrets restored to vault.\n", count)

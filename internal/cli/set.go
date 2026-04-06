@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 var (
@@ -49,13 +50,13 @@ func runSet(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if !exists && env != "default" {
-		return fmt.Errorf("Environment %q not found. Create it with \"tene env create %s\".", env, env)
+		return teneerr.ErrEnvironmentNotFound(env)
 	}
 
 	// Check if secret already exists
 	secretExists, _ := app.Vault.SecretExists(keyName, env)
 	if secretExists && !setFlagOverwrite {
-		return fmt.Errorf("Secret %q already exists. Use --overwrite to replace.", keyName)
+		return teneerr.ErrSecretAlreadyExists(keyName)
 	}
 
 	// Get value
@@ -81,10 +82,10 @@ func runSet(cmd *cobra.Command, args []string) error {
 	}
 
 	if value == "" {
-		return fmt.Errorf("Value cannot be empty.")
+		return teneerr.ErrEmptyValue
 	}
 	if len(value) > 64*1024 {
-		return fmt.Errorf("Value exceeds maximum size (64KB).")
+		return teneerr.ErrValueTooLarge
 	}
 
 	// Load master key
@@ -92,12 +93,14 @@ func runSet(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(masterKey)
 
 	// Derive encryption key
 	encKey, err := crypto.DeriveSubKey(masterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(encKey)
 
 	// Encrypt
 	ciphertext, err := crypto.Encrypt(encKey, []byte(value), []byte(keyName))
