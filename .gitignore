@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.tene/
+.env
+.env.*
+*.tene.enc
+.bkit/
+.claude/
+.DS_Store
