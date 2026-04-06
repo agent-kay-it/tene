@@ -1,3 +1,5 @@
+import { GlowCard } from "./glow-card";
+
 const features = [
   {
     icon: (
@@ -69,7 +71,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="px-6 py-24">
+    <section id="features" className="px-4 py-24 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <h2 className="text-center text-3xl font-bold sm:text-4xl">
           Everything you need.{" "}
@@ -81,25 +83,27 @@ export function Features() {
 
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <div
+            <GlowCard
               key={f.title}
               className="group rounded-xl border border-border bg-surface p-6 transition-colors hover:border-accent/30"
             >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-2 text-accent">
-                  {f.icon}
+              <div className="relative z-10">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-2 text-accent">
+                    {f.icon}
+                  </div>
+                  {f.tag && (
+                    <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-xs text-accent">
+                      {f.tag}
+                    </span>
+                  )}
                 </div>
-                {f.tag && (
-                  <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-xs text-accent">
-                    {f.tag}
-                  </span>
-                )}
+                <h3 className="text-lg font-semibold">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  {f.description}
+                </p>
               </div>
-              <h3 className="text-lg font-semibold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                {f.description}
-              </p>
-            </div>
+            </GlowCard>
           ))}
         </div>
       </div>

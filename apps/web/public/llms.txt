@@ -1,0 +1,45 @@
+# Tene
+
+> Local-first encrypted secret management CLI that AI agents understand.
+
+## Overview
+
+Tene is an open-source, local-first secret management tool designed for developers working with AI agents. It encrypts API keys, tokens, and credentials in a local SQLite vault using XChaCha20-Poly1305 encryption. No server, no signup, no cloud dependency.
+
+## Key Features
+
+- **AI Agent Auto-Detection**: `tene init` generates CLAUDE.md so Claude Code and Cursor automatically know how to retrieve secrets.
+- **Local-First Encryption**: Secrets are encrypted with XChaCha20-Poly1305 (256-bit keys) and stored in a local SQLite vault.
+- **Zero Network Calls**: 100% offline. No server, no telemetry, no internet requirement.
+- **One Command Injection**: `tene run -- <command>` injects all secrets as environment variables.
+- **Environment Switching**: `tene env prod` switches between development, staging, and production secrets.
+- **.env Migration**: `tene import .env` migrates existing environment variables into the encrypted vault.
+
+## Quick Start
+
+```bash
+npm install -g @tene/cli
+tene init
+tene set STRIPE_KEY sk_test_xxx
+tene run -- cursor .
+```
+
+## Encryption Architecture
+
+- Master Password → Argon2id (64MB memory, 3 iterations) → Master Key (256-bit)
+- Master Key cached in OS Keychain
+- Each secret encrypted with XChaCha20-Poly1305 (unique 192-bit nonce)
+- 12-word BIP-39 recovery key
+
+## Links
+
+- Website: https://tene.dev
+- GitHub: https://github.com/tomo-kay/tene
+- License: MIT
+- Price: Free (forever)
+
+## Supported Platforms
+
+- macOS
+- Linux
+- Windows (WSL)

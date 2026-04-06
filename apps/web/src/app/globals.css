@@ -35,6 +35,43 @@ body {
   color: var(--background);
 }
 
+/* Static dot grid for mobile (Canvas handles desktop) */
+.dot-grid-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #2a2a2a 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Glow card hover effect */
+.glow-card {
+  --card-mouse-x: 50%;
+  --card-mouse-y: 50%;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    400px circle at var(--card-mouse-x) var(--card-mouse-y),
+    rgba(0, 255, 136, 0.1),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glow-card:hover::before {
+  opacity: 1;
+}
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -59,7 +96,7 @@ body {
 }
 
 .terminal-cursor::after {
-  content: "█";
+  content: "\2588";
   animation: blink 1s step-end infinite;
   color: var(--accent);
 }

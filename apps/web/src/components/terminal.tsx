@@ -1,6 +1,6 @@
 export function Terminal() {
   return (
-    <section className="px-6 py-20">
+    <section className="px-4 py-20 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="flex items-center gap-2 border-b border-border px-4 py-3">
@@ -9,7 +9,7 @@ export function Terminal() {
             <div className="h-3 w-3 rounded-full bg-[#28c840]" />
             <span className="ml-3 text-xs text-muted font-mono">~/my-project</span>
           </div>
-          <div className="p-6 font-mono text-sm leading-7 overflow-x-auto">
+          <div className="overflow-x-auto p-4 font-mono text-xs leading-7 sm:p-6 sm:text-sm">
             <Line prompt>npm install -g @tene/cli</Line>
             <Line />
             <Line prompt>tene init</Line>
@@ -63,7 +63,7 @@ function Line({
 
   return (
     <div
-      className={`${green ? "text-[#28c840]" : ""} ${accent ? "text-accent font-semibold" : ""} ${dim ? "text-muted" : ""}`}
+      className={`whitespace-nowrap ${green ? "text-[#28c840]" : ""} ${accent ? "text-accent font-semibold" : ""} ${dim ? "text-muted" : ""}`}
     >
       {prompt && <span className="text-accent mr-2">$</span>}
       {children}

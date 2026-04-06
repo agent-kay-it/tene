@@ -28,7 +28,7 @@ function Cross() {
 
 export function Comparison() {
   return (
-    <section className="px-6 py-24">
+    <section className="px-4 py-24 sm:px-6">
       <div className="mx-auto max-w-4xl">
         <h2 className="text-center text-3xl font-bold sm:text-4xl">
           How Tene compares
@@ -37,46 +37,46 @@ export function Comparison() {
           Tene is the only tool that combines local-first encryption with AI agent auto-detection.
         </p>
 
-        <div className="mt-12 overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="-mx-4 mt-12 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <table className="w-full min-w-[540px] text-sm">
             <thead>
               <tr className="border-b border-border">
                 <th className="pb-4 pr-4 text-left font-normal text-muted" />
-                <th className="pb-4 px-4 text-center font-bold text-accent">Tene</th>
-                <th className="pb-4 px-4 text-center font-normal text-muted">.env</th>
-                <th className="pb-4 px-4 text-center font-normal text-muted">Doppler</th>
-                <th className="pb-4 px-4 text-center font-normal text-muted">Vault</th>
-                <th className="pb-4 px-4 text-center font-normal text-muted">Infisical</th>
+                <th className="pb-4 px-3 text-center font-bold text-accent sm:px-4">Tene</th>
+                <th className="pb-4 px-3 text-center font-normal text-muted sm:px-4">.env</th>
+                <th className="pb-4 px-3 text-center font-normal text-muted sm:px-4">Doppler</th>
+                <th className="pb-4 px-3 text-center font-normal text-muted sm:px-4">Vault</th>
+                <th className="pb-4 px-3 text-center font-normal text-muted sm:px-4">Infisical</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
                 <tr key={row.feature} className="border-b border-border/50">
-                  <td className="py-3 pr-4 text-foreground">{row.feature}</td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 pr-4 whitespace-nowrap text-foreground">{row.feature}</td>
+                  <td className="py-3 px-3 text-center sm:px-4">
                     <div className="flex justify-center">{row.tene ? <Check /> : <Cross />}</div>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-3 text-center sm:px-4">
                     <div className="flex justify-center">{row.env ? <Check /> : <Cross />}</div>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-3 text-center sm:px-4">
                     <div className="flex justify-center">{row.doppler ? <Check /> : <Cross />}</div>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-3 text-center sm:px-4">
                     <div className="flex justify-center">{row.vault ? <Check /> : <Cross />}</div>
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="py-3 px-3 text-center sm:px-4">
                     <div className="flex justify-center">{row.infisical ? <Check /> : <Cross />}</div>
                   </td>
                 </tr>
               ))}
               <tr>
                 <td className="pt-4 pr-4 text-muted">Price</td>
-                <td className="pt-4 px-4 text-center font-bold text-accent">$0</td>
-                <td className="pt-4 px-4 text-center text-muted">$0</td>
-                <td className="pt-4 px-4 text-center text-muted">$21/user/mo</td>
-                <td className="pt-4 px-4 text-center text-muted">$1,152+/mo</td>
-                <td className="pt-4 px-4 text-center text-muted">$6/user/mo</td>
+                <td className="pt-4 px-3 text-center font-bold text-accent sm:px-4">$0</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">$0</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">$21/mo</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">$1,152+</td>
+                <td className="pt-4 px-3 text-center text-muted sm:px-4">$6/mo</td>
               </tr>
             </tbody>
           </table>
