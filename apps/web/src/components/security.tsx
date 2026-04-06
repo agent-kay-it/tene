@@ -7,7 +7,7 @@ export function Security() {
           <span className="text-accent">Nothing to hack.</span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-center text-muted">
-          Your secrets never leave your device. There is no server to breach, no database to leak, no API to exploit.
+          While .env files expose secrets to every AI agent in your project, Tene keeps them encrypted on your device. No server to breach, no database to leak, no API to exploit.
         </p>
 
         <div className="mt-16 overflow-hidden rounded-xl border border-border bg-surface">

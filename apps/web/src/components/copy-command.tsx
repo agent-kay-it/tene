@@ -20,7 +20,7 @@ export function CopyCommand({
   return (
     <button
       onClick={handleCopy}
-      className={`group flex items-center gap-3 rounded-lg border border-border bg-surface px-5 py-3 font-mono text-sm transition-all hover:border-accent/50 active:scale-[0.98] ${className}`}
+      className={`group relative flex items-center gap-3 rounded-lg border border-border bg-surface px-5 py-3 font-mono text-sm transition-all hover:border-accent/50 active:scale-[0.98] ${className}`}
       title="Click to copy"
     >
       <span className="text-accent">$</span>

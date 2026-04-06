@@ -5,7 +5,7 @@ const steps = [
     step: "01",
     title: "Install",
     command: "curl -sSfL https://tene.sh/install.sh | sh",
-    description: "One command. Auto-detects your OS. No Go required, no account, no server.",
+    description: "One command. Auto-detects your OS and installs the latest binary. No Go required, no account, no server.",
   },
   {
     step: "02",

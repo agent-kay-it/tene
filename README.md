@@ -10,11 +10,9 @@
   <img src="branding/OG_image.png" alt="Tene — Secret management that AI agents understand" width="800">
 </p>
 
-**Secret management that AI agents understand.** | [Website](https://tene.sh) | [Releases](https://github.com/tomo-kay/tene/releases)
+**Your .env is not a secret. AI can read it.** | [Website](https://tene.sh) | [Releases](https://github.com/tomo-kay/tene/releases)
 
-Tene is a local-first, encrypted secret management CLI. It stores your API keys, tokens, and credentials in an encrypted SQLite vault on your device — no server, no signup, no cloud dependency.
-
-When you run `tene init`, it generates a `CLAUDE.md` file so Claude Code automatically knows how to use your secrets.
+Tene is a local-first, encrypted secret management CLI. It encrypts your secrets and injects them at runtime — so AI agents can use them without ever seeing the values.
 
 ### Supported Platforms
 
@@ -28,11 +26,35 @@ When you run `tene init`, it generates a `CLAUDE.md` file so Claude Code automat
 
 ## Why Tene?
 
-- **No server** — secrets never leave your device. Nothing to hack.
-- **No signup** — set a master password and start. No account, no email.
-- **AI-native** — Claude Code auto-detects tene via generated `CLAUDE.md`
-- **Encrypted** — XChaCha20-Poly1305 + Argon2id. OS keychain for master key.
-- **Single binary** — built in Go, ~10MB, no runtime needed.
+### .env files are not secrets
+
+Every AI coding agent — Claude Code, Cursor, Windsurf — reads your project files. That includes `.env`. Your API keys, database passwords, and tokens are sent to AI models as plaintext context.
+
+```
+  .env (plaintext)              AI Agent
+  ┌──────────────────┐         ┌──────────────────────┐
+  │ STRIPE_KEY=sk_xx │────────>│ Reads all project     │
+  │ DB_PASS=s3cur3   │────────>│ files including .env  │
+  └──────────────────┘         └──────────────────────┘
+```
+
+### Tene keeps secrets from AI
+
+Tene stores secrets in an encrypted SQLite vault. When you run `tene run -- claude`, secrets are injected as environment variables at runtime. The AI agent never sees the actual values.
+
+```
+  .tene/vault.db (encrypted)    tene run -- claude
+  ┌──────────────────┐         ┌──────────────────────┐
+  │ ████████████████ │───X───> │ Secrets injected as   │
+  │ (XChaCha20-Poly) │         │ env vars at runtime   │
+  └──────────────────┘         │ AI sees: tene run     │
+                               │ AI knows: nothing     │
+                               └──────────────────────┘
+```
+
+### Free locally. $1/mo for cloud.
+
+Local CLI is free forever — unlimited secrets, XChaCha20-Poly1305 encryption, OS keychain integration. Cloud sync ($1/user/month) eliminates repeated `tene init` + `tene set` across projects and machines. (Coming soon)
 
 ## Install
 

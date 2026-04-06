@@ -1,14 +1,15 @@
 import { CopyCommand } from "./copy-command";
 
+// Design Ref: §4.8 — "Stop using .env files" CTA
 export function CTA() {
   return (
     <section className="px-4 py-24 sm:px-6">
       <div className="mx-auto max-w-2xl rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center sm:p-12">
         <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
-          Stop worrying about secrets.
+          Stop using .env files.
         </h2>
         <p className="mx-auto mt-4 max-w-md text-sm text-muted sm:text-base">
-          Install Tene, init your project, and let Claude Code handle the rest.
+          Encrypt your secrets. Inject at runtime. AI never sees them.
           No signup. No server. Free forever.
         </p>
 
@@ -17,14 +18,6 @@ export function CTA() {
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <a
-            href="https://github.com/tomo-kay/tene/releases"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-accent-dim sm:w-auto"
-          >
-            Download binary
-          </a>
           <a
             href="https://github.com/tomo-kay/tene"
             target="_blank"
