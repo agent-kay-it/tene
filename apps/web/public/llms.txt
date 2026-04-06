@@ -49,7 +49,7 @@ tene run -- claude
 
 ## Links
 
-- Website: https://tene.dev
+- Website: https://tene.sh
 - GitHub: https://github.com/tomo-kay/tene
 - License: MIT
 - Price: Free (forever)

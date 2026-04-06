@@ -16,7 +16,30 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tene — Secret management that AI agents understand",
   description:
-    "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets. No server, no signup, no cost.",
+    "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets via CLAUDE.md. XChaCha20-Poly1305 encryption. No server, no signup, free and open source.",
+  keywords: [
+    "secret management",
+    "API key management",
+    "Claude Code",
+    "AI agent",
+    "CLI tool",
+    "encryption",
+    "XChaCha20-Poly1305",
+    "local-first",
+    "open source",
+    "Go",
+    "developer tools",
+    "vibe coding",
+    "CLAUDE.md",
+    "environment variables",
+    ".env alternative",
+  ],
+  authors: [{ name: "tomo-kay", url: "https://github.com/tomo-kay" }],
+  creator: "tomo-kay",
+  metadataBase: new URL("https://tene.sh"),
+  alternates: {
+    canonical: "https://tene.sh",
+  },
   icons: {
     icon: "/favicon.svg",
     apple: "/favicon.svg",
@@ -24,16 +47,33 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tene — Secret management that AI agents understand",
     description:
-      "Local-first encrypted secret management CLI. No server, no signup, free.",
-    url: "https://tene.dev",
+      "Local-first encrypted secret management CLI. Claude Code auto-detects your secrets. No server, no signup, free.",
+    url: "https://tene.sh",
     siteName: "Tene",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1437,
+        height: 821,
+        alt: "Tene — Secret management that AI agents understand",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Tene — Secret management that AI agents understand",
     description:
-      "Local-first encrypted secret management CLI. No server, no signup, free.",
+      "Local-first encrypted secret management CLI. Claude Code auto-detects your secrets. No server, no signup, free.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 
@@ -47,7 +87,7 @@ const jsonLd = {
       operatingSystem: "macOS, Linux, Windows (WSL)",
       description:
         "Local-first encrypted secret management CLI built in Go. Claude Code auto-detects your secrets.",
-      url: "https://tene.dev",
+      url: "https://tene.sh",
       offers: {
         "@type": "Offer",
         price: "0",

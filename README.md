@@ -1,5 +1,9 @@
 # Tene
 
+<p align="center">
+  <img src="branding/OG_image.png" alt="Tene — Secret management that AI agents understand" width="800">
+</p>
+
 **Secret management that AI agents understand.**
 
 Tene is a local-first, encrypted secret management CLI. It stores your API keys, tokens, and credentials in an encrypted SQLite vault on your device — no server, no signup, no cloud dependency.
@@ -117,6 +121,10 @@ tene import .env
 # Tip: You can now delete .env and use tene run instead.
 ```
 
+<p align="center">
+  <img src="branding/tene_core_point.png" alt="Tene Features" width="800">
+</p>
+
 ## What Tene Does / Doesn't Do
 
 ### Does
@@ -135,6 +143,10 @@ tene import .env
 - Share secrets with team members
 
 ## Comparison
+
+<p align="center">
+  <img src="branding/tene_compares.png" alt="How Tene compares" width="800">
+</p>
 
 | | Tene | .env | Doppler | Vault | Infisical |
 |---|:---:|:---:|:---:|:---:|:---:|
