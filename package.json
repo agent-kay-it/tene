@@ -1,0 +1,13 @@
+{
+  "name": "tene",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @tene/web dev",
+    "build": "pnpm --filter @tene/web build",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
