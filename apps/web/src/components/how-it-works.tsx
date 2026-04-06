@@ -12,7 +12,7 @@ const steps = [
     title: "Project Initialize",
     command: "tene init",
     description:
-      "Navigate to your project folder first. Creates an encrypted vault, generates CLAUDE.md for Claude Code, and issues a 12-word recovery key.",
+      "Navigate to your project folder first. Creates an encrypted vault, generates context files for Claude, Cursor, Windsurf, Gemini, and Codex, and issues a 12-word recovery key.",
   },
   {
     step: "03",
