@@ -152,7 +152,7 @@ const jsonLd = {
         {
           "@type": "HowToStep",
           name: "Initialize",
-          text: "Run tene init to create an encrypted vault and generate CLAUDE.md for Claude Code.",
+          text: "Run tene init to create an encrypted vault and generate context files for Claude, Cursor, Windsurf, Gemini, and Codex.",
         },
         {
           "@type": "HowToStep",
