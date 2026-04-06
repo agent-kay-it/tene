@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 	"github.com/tomo-kay/tene/internal/recovery"
 )
 
@@ -16,7 +17,7 @@ var passwdCmd = &cobra.Command{
 
 func runPasswd(cmd *cobra.Command, args []string) error {
 	if !isTerminal() {
-		return fmt.Errorf("tene passwd requires an interactive terminal.")
+		return teneerr.ErrInteractiveRequired
 	}
 
 	app, err := loadApp()
@@ -29,13 +30,15 @@ func runPasswd(cmd *cobra.Command, args []string) error {
 	fmt.Fprintln(cmd.ErrOrStderr(), "Enter current Master Password:")
 	oldMasterKey, err := loadOrPromptMasterKey(app)
 	if err != nil {
-		return fmt.Errorf("Invalid current Master Password.")
+		return teneerr.ErrInvalidPassword
 	}
+	defer crypto.ZeroBytes(oldMasterKey)
 
 	oldEncKey, err := crypto.DeriveSubKey(oldMasterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(oldEncKey)
 
 	// 2. Get new password
 	newPassword, err := promptPasswordConfirm("Enter new Master Password: ")
@@ -52,10 +55,12 @@ func runPasswd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(newMasterKey)
 	newEncKey, err := crypto.DeriveSubKey(newMasterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(newEncKey)
 
 	// 4. Re-encrypt all secrets
 	env := resolveEnv(app)

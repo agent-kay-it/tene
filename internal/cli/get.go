@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 var getCmd = &cobra.Command{
@@ -27,26 +28,28 @@ func runGet(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(masterKey)
 
 	encKey, err := crypto.DeriveSubKey(masterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(encKey)
 
 	env := resolveEnv(app)
 	secret, err := app.Vault.GetSecret(keyName, env)
 	if err != nil {
-		return fmt.Errorf("Secret %q not found in %q environment.", keyName, env)
+		return teneerr.ErrSecretNotFound(keyName, env)
 	}
 
 	ciphertext, err := decodeBase64(secret.EncryptedValue)
 	if err != nil {
-		return fmt.Errorf("failed to decode secret: %w", err)
+		return teneerr.ErrDecryptFailed
 	}
 
 	plaintext, err := crypto.Decrypt(encKey, ciphertext, []byte(keyName))
 	if err != nil {
-		return fmt.Errorf("Failed to decrypt secret. Master Password may have changed.")
+		return teneerr.ErrDecryptFailed
 	}
 
 	// Audit log

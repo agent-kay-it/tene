@@ -4,7 +4,7 @@ const SectionHeader = "# Secrets Management"
 
 const SecretsMdTemplate = `# Secrets Management
 
-This project uses [tene](https://github.com/agentkay/tene) for secret management.
+This project uses [tene](https://github.com/tomo-kay/tene) for secret management.
 
 ## Usage
 - Get a secret: ` + "`tene get <KEY>`" + `

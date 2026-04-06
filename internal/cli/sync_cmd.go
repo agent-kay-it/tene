@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/tomo-kay/tene/internal/config"
 )
 
 var syncCmd = &cobra.Command{
@@ -13,6 +14,9 @@ var syncCmd = &cobra.Command{
 }
 
 func runSync(cmd *cobra.Command, args []string) error {
+	// Record sync attempt analytics
+	_ = config.IncrementSyncAttempts()
+
 	if flagJSON {
 		return printJSON(map[string]any{
 			"ok":          true,

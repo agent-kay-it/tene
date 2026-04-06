@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 	"golang.org/x/term"
 )
 
@@ -25,23 +26,23 @@ var (
 
 func validateKeyName(name string) error {
 	if len(name) == 0 || len(name) > 256 {
-		return fmt.Errorf("Key name must be 1-256 characters.")
+		return teneerr.ErrInvalidKeyName(name)
 	}
 	if !keyNameRegex.MatchString(name) {
-		return fmt.Errorf("Invalid key name %q. Keys must match [A-Z][A-Z0-9_]*.", name)
+		return teneerr.ErrInvalidKeyName(name)
 	}
 	if reservedKeys[name] {
-		return fmt.Errorf("Key name %q is reserved.", name)
+		return teneerr.ErrReservedKeyName(name)
 	}
 	return nil
 }
 
 func validateEnvName(name string) error {
 	if len(name) == 0 || len(name) > 64 {
-		return fmt.Errorf("Environment name must be 1-64 characters.")
+		return teneerr.ErrInvalidEnvName
 	}
 	if !envNameRegex.MatchString(name) {
-		return fmt.Errorf("Invalid environment name. Must match [a-z][a-z0-9-]*.")
+		return teneerr.ErrInvalidEnvName
 	}
 	return nil
 }
@@ -60,13 +61,13 @@ func promptPasswordConfirm(prompt string) (string, error) {
 	// Check for env var first
 	if pw := os.Getenv("TENE_MASTER_PASSWORD"); pw != "" {
 		if len(pw) < 8 {
-			return "", fmt.Errorf("Master Password must be at least 8 characters.")
+			return "", teneerr.ErrPasswordTooShort
 		}
 		return pw, nil
 	}
 
 	if !isTerminal() {
-		return "", fmt.Errorf("interactive terminal required for password input. Set TENE_MASTER_PASSWORD environment variable.")
+		return "", teneerr.ErrInteractiveRequired
 	}
 
 	for attempts := 0; attempts < 3; attempts++ {
@@ -89,7 +90,7 @@ func promptPasswordConfirm(prompt string) (string, error) {
 		}
 		return pw, nil
 	}
-	return "", fmt.Errorf("too many failed attempts")
+	return "", teneerr.ErrPasswordMismatch
 }
 
 func promptConfirm(msg string) bool {

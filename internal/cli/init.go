@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/claudemd"
+	"github.com/tomo-kay/tene/internal/config"
 	"github.com/tomo-kay/tene/internal/crypto"
 	"github.com/tomo-kay/tene/internal/keychain"
 	"github.com/tomo-kay/tene/internal/recovery"
@@ -59,6 +60,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(masterKey)
 
 	// 4. Create .tene/ directory
 	teneDir := filepath.Join(dir, ".tene")
@@ -122,6 +124,15 @@ func runInit(cmd *cobra.Command, args []string) error {
 	if err := ks.Store(masterKey); err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: could not store key in keychain: %v\n", err)
 	}
+
+	// 9.5. Create .tene/vault.json
+	vaultJSONPath := filepath.Join(teneDir, "vault.json")
+	if err := vault.WriteVaultJSON(vaultJSONPath, projectName, "default"); err != nil {
+		return fmt.Errorf("Cannot create vault.json: %w", err)
+	}
+
+	// 9.6. Ensure global config directory
+	_ = config.EnsureConfigDir()
 
 	// 10. Create .tene/.gitignore
 	_ = writeGitignore(filepath.Join(teneDir, ".gitignore"))

@@ -2,8 +2,11 @@ package cli
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
+	"github.com/tomo-kay/tene/internal/vault"
 )
 
 var envCmd = &cobra.Command{
@@ -58,7 +61,7 @@ func runEnv(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if !exists {
-		return fmt.Errorf("Environment %q not found. Create it with \"tene env create %s\".", envName, envName)
+		return teneerr.ErrEnvironmentNotFound(envName)
 	}
 
 	previous, _ := app.Vault.GetActiveEnvironment()
@@ -66,6 +69,13 @@ func runEnv(cmd *cobra.Command, args []string) error {
 	if err := app.Vault.SetActiveEnvironment(envName); err != nil {
 		return err
 	}
+
+	// Update vault.json (non-critical; SQLite is primary source)
+	vaultJSONPath := filepath.Join(app.Dir, ".tene", "vault.json")
+	_ = vault.UpdateVaultJSONEnv(vaultJSONPath, envName)
+
+	// Audit log
+	_ = app.Vault.AddAuditLog("env.switch", envName, fmt.Sprintf("from=%s,to=%s", previous, envName))
 
 	if flagJSON {
 		return printJSON(map[string]any{
@@ -146,8 +156,11 @@ func runEnvCreate(cmd *cobra.Command, args []string) error {
 	defer app.Vault.Close()
 
 	if err := app.Vault.CreateEnvironment(envName); err != nil {
-		return fmt.Errorf("Environment %q already exists.", envName)
+		return teneerr.ErrEnvironmentAlreadyExists(envName)
 	}
+
+	// Audit log
+	_ = app.Vault.AddAuditLog("env.create", envName, "")
 
 	if flagJSON {
 		return printJSON(map[string]any{
@@ -174,13 +187,13 @@ func runEnvDelete(cmd *cobra.Command, args []string) error {
 
 	// Cannot delete "default"
 	if envName == "default" {
-		return fmt.Errorf("Cannot delete the \"default\" environment.")
+		return teneerr.ErrEnvironmentProtected("default", "It is the default environment.")
 	}
 
 	// Cannot delete active environment
 	active, _ := app.Vault.GetActiveEnvironment()
 	if envName == active {
-		return fmt.Errorf("Cannot delete the active environment. Switch to another first.")
+		return teneerr.ErrEnvironmentProtected(envName, "Switch to another first.")
 	}
 
 	// Confirm
@@ -200,8 +213,11 @@ func runEnvDelete(cmd *cobra.Command, args []string) error {
 
 	secretsRemoved, err := app.Vault.DeleteEnvironment(envName)
 	if err != nil {
-		return fmt.Errorf("Environment %q not found.", envName)
+		return teneerr.ErrEnvironmentNotFound(envName)
 	}
+
+	// Audit log
+	_ = app.Vault.AddAuditLog("env.delete", envName, fmt.Sprintf("secretsRemoved=%d", secretsRemoved))
 
 	if flagJSON {
 		return printJSON(map[string]any{

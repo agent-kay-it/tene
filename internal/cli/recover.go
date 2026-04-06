@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tomo-kay/tene/internal/crypto"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 	"github.com/tomo-kay/tene/internal/recovery"
 )
 
@@ -19,7 +20,7 @@ var recoverCmd = &cobra.Command{
 
 func runRecover(cmd *cobra.Command, args []string) error {
 	if !isTerminal() {
-		return fmt.Errorf("tene recover requires an interactive terminal.")
+		return teneerr.ErrInteractiveRequired
 	}
 
 	app, err := loadApp()
@@ -38,7 +39,7 @@ func runRecover(cmd *cobra.Command, args []string) error {
 	mnemonic = strings.TrimSpace(mnemonic)
 
 	if !recovery.ValidateMnemonic(mnemonic) {
-		return fmt.Errorf("Invalid Recovery Key.")
+		return teneerr.ErrInvalidRecoveryKey
 	}
 
 	// 2. Load recovery blob from vault
@@ -54,13 +55,15 @@ func runRecover(cmd *cobra.Command, args []string) error {
 	// 3. Recover old master key
 	oldMasterKey, err := recovery.RecoverMasterKey(blob, mnemonic)
 	if err != nil {
-		return fmt.Errorf("Recovery failed. The Recovery Key may be incorrect.")
+		return teneerr.ErrInvalidRecoveryKey
 	}
+	defer crypto.ZeroBytes(oldMasterKey)
 
 	oldEncKey, err := crypto.DeriveSubKey(oldMasterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(oldEncKey)
 
 	// 4. Get new master password
 	newPassword, err := promptPasswordConfirm("Enter new Master Password: ")
@@ -77,10 +80,12 @@ func runRecover(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(newMasterKey)
 	newEncKey, err := crypto.DeriveSubKey(newMasterKey, crypto.PurposeEncryption, 32)
 	if err != nil {
 		return err
 	}
+	defer crypto.ZeroBytes(newEncKey)
 
 	// 6. Re-encrypt all secrets across all environments
 	envs, err := app.Vault.ListEnvironments()

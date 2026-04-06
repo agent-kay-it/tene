@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	teneerr "github.com/tomo-kay/tene/internal/errors"
 )
 
 var deleteFlagForce bool
@@ -36,7 +37,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if !exists {
-		return fmt.Errorf("Secret %q not found in %q environment.", keyName, env)
+		return teneerr.ErrSecretNotFound(keyName, env)
 	}
 
 	// Confirm
