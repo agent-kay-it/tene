@@ -1,3 +1,5 @@
+import { CopyCommand } from "./copy-command";
+
 export function Hero() {
   return (
     <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-4 pt-14 sm:px-6">
@@ -24,19 +26,7 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:mt-10 sm:flex-row sm:justify-center">
-          <div className="group flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-surface px-5 py-3 font-mono text-sm transition-colors hover:border-accent/50 sm:w-auto">
-            <span className="text-accent">$</span>
-            <code>npm install -g @tene/cli</code>
-            <button
-              className="text-muted transition-colors hover:text-accent"
-              title="Copy to clipboard"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" strokeWidth="2" />
-              </svg>
-            </button>
-          </div>
+          <CopyCommand command="npm install -g @tene/cli" className="relative w-full justify-center sm:w-auto" />
 
           <a
             href="https://github.com/tomo-kay/tene"

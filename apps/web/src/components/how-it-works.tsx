@@ -1,3 +1,5 @@
+import { CopyCommand } from "./copy-command";
+
 const steps = [
   {
     step: "01",
@@ -50,10 +52,7 @@ export function HowItWorks() {
               </div>
               <div className="pb-12">
                 <h3 className="text-xl font-semibold">{s.title}</h3>
-                <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 font-mono text-sm">
-                  <span className="text-accent">$</span>
-                  <code>{s.command}</code>
-                </div>
+                <CopyCommand command={s.command} className="relative mt-3 text-xs sm:text-sm" />
                 <p className="mt-3 text-sm leading-relaxed text-muted">
                   {s.description}
                 </p>

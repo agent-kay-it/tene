@@ -1,3 +1,5 @@
+import { CopyCommand } from "./copy-command";
+
 export function CTA() {
   return (
     <section className="px-4 py-24 sm:px-6">
@@ -10,9 +12,8 @@ export function CTA() {
           No signup. No server. Free forever.
         </p>
 
-        <div className="mt-8 inline-flex items-center gap-3 rounded-lg border border-accent/30 bg-surface px-5 py-3 font-mono text-xs sm:px-6 sm:text-sm">
-          <span className="text-accent">$</span>
-          <code>npm install -g @tene/cli</code>
+        <div className="mt-8 flex justify-center">
+          <CopyCommand command="npm install -g @tene/cli" className="relative border-accent/30 text-xs sm:text-sm" />
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

@@ -7,3 +7,4 @@ dist/
 .bkit/
 .claude/
 .DS_Store
+.next/
