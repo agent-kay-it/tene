@@ -85,7 +85,7 @@ func NewServer(cfg Config) *echo.Echo {
 
 	// Handlers
 	healthH := &handler.HealthHandler{}
-	authH := handler.NewAuthHandler(oauthSvc, jwtSvc)
+	authH := handler.NewAuthHandler(oauthSvc, jwtSvc, cfg.DashboardURL)
 	vaultH := handler.NewVaultHandler(vaultStore, s3Client)
 	billingH := handler.NewBillingHandler(billingSvc)
 	waitlistH := handler.NewWaitlistHandler(waitlistStore)
