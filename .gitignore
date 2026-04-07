@@ -9,9 +9,11 @@ dist/
 .DS_Store
 .next/
 bin/
-tene
-server
-docs/
+
+# Build binaries (not source directories)
+/tene
+/server
+/tene-dev
 
 # Terraform
 infra/terraform/environments/prod/.terraform/
