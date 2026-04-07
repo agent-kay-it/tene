@@ -38,7 +38,7 @@ func runLogin(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Fprintln(cmd.ErrOrStderr(), "  Signing in with GitHub...")
+	_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "  Signing in with GitHub...")
 
 	// Start local callback server
 	listener, err := net.Listen("tcp", "127.0.0.1:0")

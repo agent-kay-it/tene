@@ -157,7 +157,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 	// 9.5. Create .tene/vault.json
 	vaultJSONPath := filepath.Join(teneDir, "vault.json")
 	if err := vault.WriteVaultJSON(vaultJSONPath, projectName, "default"); err != nil {
-		return fmt.Errorf("Cannot create vault.json: %w", err)
+		return fmt.Errorf("cannot create vault.json: %w", err)
 	}
 
 	// 9.6. Ensure global config directory

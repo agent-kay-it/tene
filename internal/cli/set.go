@@ -80,7 +80,7 @@ func runSet(cmd *cobra.Command, args []string) error {
 	} else {
 		// Interactive prompt
 		if !isTerminal() {
-			return fmt.Errorf("Value required. Provide VALUE argument or use --stdin.")
+			return fmt.Errorf("value required: provide VALUE argument or use --stdin")
 		}
 		var err error
 		value, err = promptPassword("Value: ")

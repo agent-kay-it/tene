@@ -106,9 +106,9 @@ func runBillingUpgrade(cmd *cobra.Command, args []string) error {
 
 	_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  Opening checkout...\n")
 	if err := openBrowser(checkoutURL); err != nil {
-		fmt.Fprintf(cmd.ErrOrStderr(), "  Could not open browser. Visit:\n  %s\n", checkoutURL)
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  Could not open browser. Visit:\n  %s\n", checkoutURL)
 	} else {
-		fmt.Fprintf(cmd.ErrOrStderr(), "  ✓ Checkout opened in browser\n")
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  ✓ Checkout opened in browser\n")
 	}
 
 	return nil
@@ -131,9 +131,9 @@ func runBillingPortal(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("billing: no portal URL. Are you on Pro plan?")
 	}
 
-	fmt.Fprintf(cmd.ErrOrStderr(), "  Opening subscription portal...\n")
+	_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  Opening subscription portal...\n")
 	if err := openBrowser(portalURL); err != nil {
-		fmt.Fprintf(cmd.ErrOrStderr(), "  Visit:\n  %s\n", portalURL)
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  Visit:\n  %s\n", portalURL)
 	}
 
 	return nil
@@ -171,7 +171,7 @@ func doAPIRequest(req *http.Request) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var apiResp struct {
 		OK   bool           `json:"ok"`

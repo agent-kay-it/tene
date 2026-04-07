@@ -25,7 +25,7 @@ func runLogout(cmd *cobra.Command, args []string) error {
 
 	token, _ := loadAuthToken()
 	if token == "" {
-		fmt.Fprintln(cmd.ErrOrStderr(), "  Not logged in.")
+		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "  Not logged in.")
 		return nil
 	}
 
@@ -38,7 +38,7 @@ func runLogout(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("logout: clear credentials: %w", err)
 	}
 
-	fmt.Fprintln(cmd.ErrOrStderr(), "  Signed out. Your local vault data is preserved.")
+	_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "  Signed out. Your local vault data is preserved.")
 	return nil
 }
 
