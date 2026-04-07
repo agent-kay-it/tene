@@ -31,7 +31,7 @@ func runLogout(cmd *cobra.Command, args []string) error {
 
 	// Attempt to revoke the token on the server; failure is non-fatal.
 	if err := callSignout(cmd.Context(), apiURL, token); err != nil {
-		fmt.Fprintf(cmd.ErrOrStderr(), "  Warning: server signout failed (%v). Clearing local credentials anyway.\n", err)
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "  Warning: server signout failed (%v). Clearing local credentials anyway.\n", err)
 	}
 
 	if err := clearAuthFile(); err != nil {
@@ -59,7 +59,7 @@ func callSignout(ctx context.Context, apiURL, token string) error {
 	if err != nil {
 		return fmt.Errorf("request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("server returned %d", resp.StatusCode)

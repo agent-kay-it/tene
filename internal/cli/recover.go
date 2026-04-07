@@ -27,7 +27,7 @@ func runRecover(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer app.Vault.Close()
+	defer func() { _ = app.Vault.Close() }()
 
 	// 1. Get recovery key (12 words)
 	fmt.Fprint(os.Stderr, "Enter Recovery Key (12 words): ")
