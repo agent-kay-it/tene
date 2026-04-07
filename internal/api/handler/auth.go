@@ -21,6 +21,7 @@ const stateTTL = 5 * time.Minute
 
 type stateEntry struct {
 	codeVerifier string
+	redirectTo   string // "dashboard" or empty (API-only)
 	expiresAt    time.Time
 }
 
@@ -35,20 +36,22 @@ type refreshEntry struct {
 
 // AuthHandler handles OAuth and token endpoints.
 type AuthHandler struct {
-	oauth    *auth.OAuthService
-	jwt      *auth.JWTService
-	mu       sync.RWMutex
-	states   map[string]stateEntry   // in-memory state store with TTL (replace with Redis in prod)
-	refresh  map[string]refreshEntry // in-memory refresh token store (replace with DB in prod)
+	oauth        *auth.OAuthService
+	jwt          *auth.JWTService
+	dashboardURL string // For post-login redirect (e.g. "https://app.tene.sh")
+	mu           sync.RWMutex
+	states       map[string]stateEntry   // in-memory state store with TTL (replace with Redis in prod)
+	refresh      map[string]refreshEntry // in-memory refresh token store (replace with DB in prod)
 }
 
 // NewAuthHandler creates an auth handler.
-func NewAuthHandler(oauth *auth.OAuthService, jwt *auth.JWTService) *AuthHandler {
+func NewAuthHandler(oauth *auth.OAuthService, jwt *auth.JWTService, dashboardURL string) *AuthHandler {
 	h := &AuthHandler{
-		oauth:   oauth,
-		jwt:     jwt,
-		states:  make(map[string]stateEntry),
-		refresh: make(map[string]refreshEntry),
+		oauth:        oauth,
+		jwt:          jwt,
+		dashboardURL: dashboardURL,
+		states:       make(map[string]stateEntry),
+		refresh:      make(map[string]refreshEntry),
 	}
 	go h.cleanupLoop()
 	return h
@@ -90,6 +93,7 @@ func (h *AuthHandler) GitHubAuthorize(c echo.Context) error {
 	h.mu.Lock()
 	h.states[state] = stateEntry{
 		codeVerifier: pkce.CodeVerifier,
+		redirectTo:   c.QueryParam("redirect"), // "dashboard" or empty
 		expiresAt:    time.Now().Add(stateTTL),
 	}
 	h.mu.Unlock()
@@ -162,6 +166,14 @@ func (h *AuthHandler) GitHubCallback(c echo.Context) error {
 	// L-04: Security audit logging
 	slog.Info("auth.login.success", "user_id", user.ID, "provider", "github", "ip", c.RealIP())
 
+	// If request came from dashboard, redirect back with tokens
+	if entry.redirectTo == "dashboard" && h.dashboardURL != "" {
+		redirectURL := fmt.Sprintf("%s/auth/callback?access_token=%s&refresh_token=%s",
+			h.dashboardURL, accessToken, refreshToken)
+		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+	}
+
+	// CLI / API-only flow: return JSON
 	return response.OK(c, http.StatusOK, map[string]any{
 		"user": user,
 		"tokens": domain.TokenPair{
