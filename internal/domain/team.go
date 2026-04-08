@@ -25,6 +25,17 @@ type TeamMember struct {
 	JoinedAt          string   `json:"joined_at"`
 }
 
+// TeamMemberView is an enriched member view with user profile info for display.
+type TeamMemberView struct {
+	TeamID         string   `json:"team_id"`
+	UserID         string   `json:"user_id"`
+	Role           string   `json:"role"`
+	EnvPermissions []string `json:"env_permissions"`
+	JoinedAt       string   `json:"joined_at"`
+	Name           string   `json:"name"`
+	AvatarURL      string   `json:"avatar_url"`
+}
+
 // TeamInvite holds the data needed to invite a member to a team.
 type TeamInvite struct {
 	TeamID            string `json:"team_id"`

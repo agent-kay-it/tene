@@ -80,7 +80,7 @@ export function Pricing() {
                       href={`${dashboardUrl}/login?intent=upgrade`}
                       className="block w-full rounded-lg bg-accent py-3 text-center text-sm font-medium text-background transition-colors hover:bg-accent-dim active:scale-[0.98]"
                     >
-                      {tier.cta.label}
+                      {tier.cta.label} &rarr;
                     </a>
                   )}
                 </div>

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"regexp"
@@ -219,14 +220,25 @@ func (s *MemTeamStore) IsAdmin(teamID, userID string) bool {
 	return false
 }
 
+// UserLookup resolves user IDs to display info.
+type UserLookup interface {
+	GetUserByID(ctx context.Context, id string) (*domain.User, error)
+}
+
 // TeamHandler handles team CRUD and member management.
 type TeamHandler struct {
-	store TeamStore
+	store      TeamStore
+	userLookup UserLookup
 }
 
 // NewTeamHandler creates a team handler.
 func NewTeamHandler(store TeamStore) *TeamHandler {
 	return &TeamHandler{store: store}
+}
+
+// SetUserLookup wires the user lookup for enriched member responses.
+func (h *TeamHandler) SetUserLookup(ul UserLookup) {
+	h.userLookup = ul
 }
 
 // Create creates a new team. Requires Pro plan.
@@ -259,12 +271,13 @@ func (h *TeamHandler) Create(c echo.Context) error {
 		return response.Err(c, err)
 	}
 
-	// Auto-add owner as admin member
+	// Auto-add owner as admin member with full environment access
 	if err := h.store.AddMember(&domain.TeamMember{
-		TeamID:   team.ID,
-		UserID:   claims.UserID,
-		Role:     "admin",
-		JoinedAt: time.Now().UTC().Format(time.RFC3339),
+		TeamID:         team.ID,
+		UserID:         claims.UserID,
+		Role:           "admin",
+		EnvPermissions: []string{"*"},
+		JoinedAt:       time.Now().UTC().Format(time.RFC3339),
 	}); err != nil {
 		slog.Error("team.create.add_owner_failed", "team_id", team.ID, "error", err)
 		return response.ErrMsg(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to add owner to team")
@@ -304,9 +317,10 @@ func (h *TeamHandler) Invite(c echo.Context) error {
 	}
 
 	var req struct {
-		UserID            string `json:"user_id"`
-		Role              string `json:"role"`
-		WrappedProjectKey []byte `json:"wrapped_project_key"`
+		UserID            string   `json:"user_id"`
+		Role              string   `json:"role"`
+		EnvPermissions    []string `json:"env_permissions"`
+		WrappedProjectKey []byte   `json:"wrapped_project_key"`
 	}
 	if err := c.Bind(&req); err != nil || req.UserID == "" {
 		return response.ErrMsg(c, http.StatusBadRequest, "BAD_REQUEST", "user_id required")
@@ -317,11 +331,20 @@ func (h *TeamHandler) Invite(c echo.Context) error {
 	if req.Role != "admin" && req.Role != "member" {
 		return response.ErrMsg(c, http.StatusBadRequest, "BAD_REQUEST", "role must be admin or member")
 	}
+	// Default env permissions: admin gets all, member gets dev+staging
+	if len(req.EnvPermissions) == 0 {
+		if req.Role == "admin" {
+			req.EnvPermissions = []string{"*"}
+		} else {
+			req.EnvPermissions = []string{"dev", "staging"}
+		}
+	}
 
 	member := &domain.TeamMember{
 		TeamID:            teamID,
 		UserID:            req.UserID,
 		Role:              req.Role,
+		EnvPermissions:    req.EnvPermissions,
 		WrappedProjectKey: req.WrappedProjectKey,
 		JoinedAt:          time.Now().UTC().Format(time.RFC3339),
 	}
@@ -386,7 +409,7 @@ func (h *TeamHandler) RemoveMember(c echo.Context) error {
 	})
 }
 
-// ListMembers returns all members of a team.
+// ListMembers returns all members of a team, enriched with user profile info.
 func (h *TeamHandler) ListMembers(c echo.Context) error {
 	claims := middleware.GetClaims(c)
 	if claims == nil {
@@ -401,6 +424,26 @@ func (h *TeamHandler) ListMembers(c echo.Context) error {
 	members, err := h.store.ListMembers(teamID)
 	if err != nil {
 		return response.Err(c, err)
+	}
+
+	// Enrich with user profile info if user lookup is available
+	if h.userLookup != nil {
+		views := make([]domain.TeamMemberView, 0, len(members))
+		for _, m := range members {
+			v := domain.TeamMemberView{
+				TeamID:         m.TeamID,
+				UserID:         m.UserID,
+				Role:           m.Role,
+				EnvPermissions: m.EnvPermissions,
+				JoinedAt:       m.JoinedAt,
+			}
+			if user, err := h.userLookup.GetUserByID(c.Request().Context(), m.UserID); err == nil {
+				v.Name = user.Name
+				v.AvatarURL = user.AvatarURL
+			}
+			views = append(views, v)
+		}
+		return response.OK(c, http.StatusOK, views)
 	}
 
 	return response.OK(c, http.StatusOK, members)

@@ -79,7 +79,7 @@ func TestVaultHandler_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := NewMemVaultStore()
-			h := NewVaultHandler(store, nil)
+			h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 			// Pre-create a vault for the duplicate test
 			if tt.name == "duplicate project" {
@@ -158,7 +158,7 @@ func TestVaultHandler_List(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := NewMemVaultStore()
-			h := NewVaultHandler(store, nil)
+			h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 			// Seed vaults
 			for i := 0; i < tt.seedCount; i++ {
@@ -202,7 +202,7 @@ func TestVaultHandler_List(t *testing.T) {
 
 func TestVaultHandler_Get(t *testing.T) {
 	store := NewMemVaultStore()
-	h := NewVaultHandler(store, nil)
+	h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 	// Create a vault first
 	e := echo.New()
@@ -296,7 +296,7 @@ func TestVaultHandler_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			store := NewMemVaultStore()
-			h := NewVaultHandler(store, nil)
+			h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 			// Create a vault
 			e := echo.New()
@@ -333,7 +333,7 @@ func TestVaultHandler_Delete(t *testing.T) {
 
 func TestVaultHandler_Push_EmptyBody(t *testing.T) {
 	store := NewMemVaultStore()
-	h := NewVaultHandler(store, nil)
+	h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 	// Create vault first
 	e := echo.New()
@@ -373,7 +373,7 @@ func TestVaultHandler_Push_EmptyBody(t *testing.T) {
 
 func TestVaultHandler_Push_FreePlanRejected(t *testing.T) {
 	store := NewMemVaultStore()
-	h := NewVaultHandler(store, nil)
+	h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString("data"))
@@ -390,7 +390,7 @@ func TestVaultHandler_Push_FreePlanRejected(t *testing.T) {
 
 func TestVaultHandler_Pull_NoPush(t *testing.T) {
 	store := NewMemVaultStore()
-	h := NewVaultHandler(store, nil)
+	h := NewVaultHandler(store, NewMemVaultKeyMetadataStore(), nil)
 
 	// Create vault (version 0, never pushed)
 	e := echo.New()

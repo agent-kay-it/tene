@@ -57,6 +57,7 @@ func NewServer(cfg Config) (*echo.Echo, func(), error) {
 	// Database: PostgreSQL or in-memory fallback
 	var (
 		vaultStore    handler.VaultStore
+		keyMetaStore  handler.VaultKeyMetadataStore
 		teamStore     handler.TeamStore
 		deviceStore   handler.DeviceStore
 		auditStore    handler.AuditStore
@@ -78,6 +79,7 @@ func NewServer(cfg Config) (*echo.Echo, func(), error) {
 
 		userRepo := postgres.NewUserRepo(db.Pool)
 		vaultStore = postgres.NewVaultRepo(db.Pool)
+		keyMetaStore = postgres.NewVaultKeyMetadataRepo(db.Pool)
 		teamStore = postgres.NewTeamRepo(db.Pool)
 		deviceStore = postgres.NewDeviceRepo(db.Pool)
 		auditStore = postgres.NewAuditRepo(db.Pool)
@@ -87,6 +89,7 @@ func NewServer(cfg Config) (*echo.Echo, func(), error) {
 	} else {
 		slog.Warn("database.fallback", "mode", "in-memory", "reason", "DATABASE_URL not set")
 		vaultStore = handler.NewMemVaultStore()
+		keyMetaStore = handler.NewMemVaultKeyMetadataStore()
 		teamStore = handler.NewMemTeamStore()
 		deviceStore = handler.NewMemDeviceStore()
 		auditStore = handler.NewMemAuditStore()
@@ -121,16 +124,18 @@ func NewServer(cfg Config) (*echo.Echo, func(), error) {
 	// Handlers
 	healthH := &handler.HealthHandler{DB: dbPinger}
 	authH := handler.NewAuthHandler(oauthSvc, jwtSvc, cfg.DashboardURL)
-	vaultH := handler.NewVaultHandler(vaultStore, s3Client)
+	vaultH := handler.NewVaultHandler(vaultStore, keyMetaStore, s3Client)
 	billingH := handler.NewBillingHandler(billingSvc)
 	waitlistH := handler.NewWaitlistHandler(waitlistStore)
 	teamH := handler.NewTeamHandler(teamStore)
 	deviceH := handler.NewDeviceHandler(deviceStore)
 	auditH := handler.NewAuditHandler(auditStore)
+	onboardingH := handler.NewOnboardingHandler(vaultStore, deviceStore)
 
 	// Wire auth handler user store for enriched /auth/me responses
 	if authUserStore != nil {
 		authH.SetUserStore(authUserStore)
+		teamH.SetUserLookup(authUserStore)
 	}
 
 	// Global middleware (order matters)
@@ -202,6 +207,7 @@ func NewServer(cfg Config) (*echo.Echo, func(), error) {
 	authed.GET("/vaults", vaultH.List)
 	authed.POST("/vaults", vaultH.Create)
 	authed.GET("/vaults/:id", vaultH.Get)
+	authed.GET("/vaults/:id/keys", vaultH.ListKeys)
 	authed.POST("/vaults/:id/push", vaultH.Push, echoMw.BodyLimit("50M"))
 	authed.GET("/vaults/:id/pull", vaultH.Pull)
 	authed.DELETE("/vaults/:id", vaultH.Delete)
@@ -229,6 +235,10 @@ func NewServer(cfg Config) (*echo.Echo, func(), error) {
 
 	// Audit routes (W5)
 	authed.GET("/audit", auditH.List)
+
+	// Onboarding routes
+	authed.GET("/onboarding/status", onboardingH.GetStatus)
+	authed.POST("/onboarding/dismiss", onboardingH.Dismiss)
 
 	// Waitlist (public)
 	v1.POST("/waitlist", waitlistH.Register)

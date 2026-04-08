@@ -31,6 +31,8 @@ export interface TeamMember {
   role: string;
   env_permissions: string[];
   joined_at: string;
+  name?: string;
+  avatar_url?: string;
 }
 
 export interface Device {
@@ -48,6 +50,33 @@ export interface AuditLog {
   detail?: string;
   ip_address?: string;
   created_at: string;
+}
+
+export interface VaultKeyEntry {
+  name: string;
+  version: number;
+  updated_at: string;
+}
+
+export interface VaultKeysResponse {
+  vault_id: string;
+  environment: string;
+  keys: VaultKeyEntry[];
+  environments: string[];
+}
+
+export interface OnboardingStatus {
+  cli_installed: boolean;
+  first_push: boolean;
+  second_device: boolean;
+  completed: boolean;
+  dismissed: boolean;
+}
+
+export interface AuditFilter {
+  action?: string;
+  limit?: number;
+  offset?: number;
 }
 
 // --- API Response ---
@@ -229,10 +258,10 @@ class ApiClient {
     });
   }
 
-  inviteTeamMember(teamId: string, email: string, role: string) {
+  inviteTeamMember(teamId: string, userId: string, role: string, envPermissions?: string[]) {
     return this.request<TeamMember>(`/api/v1/teams/${teamId}/invite`, {
       method: "POST",
-      body: JSON.stringify({ email, role }),
+      body: JSON.stringify({ user_id: userId, role, env_permissions: envPermissions }),
     });
   }
 
@@ -274,13 +303,23 @@ class ApiClient {
     return this.request<AuditLog[]>(`/api/v1/audit${qs ? `?${qs}` : ""}`);
   }
 
-  // Waitlist
-  joinWaitlist(email: string) {
-    return this.request<{ message: string }>("/api/v1/waitlist", {
+  // Vault Keys (metadata only, no values)
+  getVaultKeys(vaultId: string, env?: string) {
+    const query = env ? `?env=${encodeURIComponent(env)}` : "";
+    return this.request<VaultKeysResponse>(`/api/v1/vaults/${vaultId}/keys${query}`);
+  }
+
+  // Onboarding
+  getOnboardingStatus() {
+    return this.request<OnboardingStatus>("/api/v1/onboarding/status");
+  }
+
+  dismissOnboarding() {
+    return this.request<{ message: string }>("/api/v1/onboarding/dismiss", {
       method: "POST",
-      body: JSON.stringify({ email, source: "dashboard" }),
     });
   }
+
 }
 
 export const api = new ApiClient();

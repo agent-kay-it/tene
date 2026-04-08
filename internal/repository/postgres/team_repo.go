@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -188,7 +189,9 @@ func (r *TeamRepo) ListMembers(teamID string) ([]domain.TeamMember, error) {
 		if envPermsJSON != nil {
 			_ = json.Unmarshal(envPermsJSON, &m.EnvPermissions)
 		}
-		if joinedAt != nil {
+		if t, ok := joinedAt.(time.Time); ok {
+			m.JoinedAt = t.Format(time.RFC3339)
+		} else if joinedAt != nil {
 			m.JoinedAt = fmt.Sprintf("%v", joinedAt)
 		}
 		members = append(members, m)
