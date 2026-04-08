@@ -1,6 +1,17 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { StatCard } from "@/components/stat-card";
+import { api } from "@/lib/api";
 
 export default function OverviewPage() {
+  const { data: vaults } = useQuery({
+    queryKey: ["vaults"],
+    queryFn: () => api.listVaults(),
+  });
+
+  const vaultCount = vaults?.length ?? 0;
+
   return (
     <div className="space-y-8">
       <div>
@@ -9,7 +20,7 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Vaults" value={0} sub="synced projects" accent />
+        <StatCard label="Vaults" value={vaultCount} sub="synced projects" accent />
         <StatCard label="Secrets" value={0} sub="total keys" />
         <StatCard label="Devices" value={0} sub="registered" />
         <StatCard label="Events" value={0} sub="this week" />

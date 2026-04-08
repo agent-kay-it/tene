@@ -3,6 +3,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"github.com/tomo-kay/tene/internal/api/storage"
 	"github.com/tomo-kay/tene/internal/auth"
 	"github.com/tomo-kay/tene/internal/billing"
+	"github.com/tomo-kay/tene/internal/repository/postgres"
 )
 
 // Config holds API server configuration.
@@ -34,10 +36,13 @@ type Config struct {
 	LemonStoreID       string
 	LemonProVariantID  string
 	DashboardURL       string
+	DatabaseURL        string // PostgreSQL connection string; empty = in-memory fallback
 }
 
 // NewServer creates and configures the Echo server with all routes.
-func NewServer(cfg Config) *echo.Echo {
+// Returns the Echo instance, a cleanup function, and any initialization error.
+// The cleanup function must be called on shutdown to release resources (e.g. DB pool).
+func NewServer(cfg Config) (*echo.Echo, func(), error) {
 	e := echo.New()
 	e.HideBanner = true
 
@@ -48,13 +53,50 @@ func NewServer(cfg Config) *echo.Echo {
 		echo.TrustPrivateNet(false),
 	)
 
+	// Database: PostgreSQL or in-memory fallback
+	var (
+		vaultStore    handler.VaultStore
+		teamStore     handler.TeamStore
+		deviceStore   handler.DeviceStore
+		auditStore    handler.AuditStore
+		waitlistStore handler.WaitlistStore
+		userStore     billing.UserStore
+		authUserStore handler.AuthUserStore // for enriched /auth/me responses
+		dbPinger      handler.DBPinger      // for readiness health check
+		cleanup       = func() {}
+	)
+
+	if cfg.DatabaseURL != "" {
+		db, err := postgres.New(context.Background(), cfg.DatabaseURL)
+		if err != nil {
+			return nil, nil, fmt.Errorf("server: database: %w", err)
+		}
+		cleanup = db.Close
+		dbPinger = db.Pool
+		slog.Info("database.connected", "driver", "postgresql")
+
+		userRepo := postgres.NewUserRepo(db.Pool)
+		vaultStore = postgres.NewVaultRepo(db.Pool)
+		teamStore = postgres.NewTeamRepo(db.Pool)
+		deviceStore = postgres.NewDeviceRepo(db.Pool)
+		auditStore = postgres.NewAuditRepo(db.Pool)
+		waitlistStore = postgres.NewWaitlistRepo(db.Pool)
+		userStore = userRepo
+		authUserStore = userRepo
+	} else {
+		slog.Warn("database.fallback", "mode", "in-memory", "reason", "DATABASE_URL not set")
+		vaultStore = handler.NewMemVaultStore()
+		teamStore = handler.NewMemTeamStore()
+		deviceStore = handler.NewMemDeviceStore()
+		auditStore = handler.NewMemAuditStore()
+		waitlistStore = handler.NewMemWaitlistStore()
+		// userStore remains nil (billing webhook disabled without DB)
+	}
+
 	// Services
 	jwtSvc := auth.NewJWTService(cfg.JWTSecret)
 	oauthSvc := auth.NewOAuthService(cfg.GitHubClientID, cfg.GitHubClientSecret, cfg.CallbackBase)
 	rateLimiter := mw.NewRateLimiter(cfg.FreeRPM, cfg.ProRPM)
-
-	// Vault store (in-memory for dev; replace with PostgreSQL in prod)
-	vaultStore := handler.NewMemVaultStore()
 
 	// S3 client (nil-safe: push/pull will fail with clear error if not configured)
 	var s3Client *storage.S3Client
@@ -73,18 +115,10 @@ func NewServer(cfg Config) *echo.Echo {
 		StoreID:       cfg.LemonStoreID,
 		ProVariantID:  cfg.LemonProVariantID,
 		DashboardURL:  cfg.DashboardURL,
-	}, nil) // UserStore wired when DB connected
-
-	// Team, device, audit stores (in-memory for dev)
-	teamStore := handler.NewMemTeamStore()
-	deviceStore := handler.NewMemDeviceStore()
-	auditStore := handler.NewMemAuditStore()
-
-	// Waitlist store
-	waitlistStore := handler.NewMemWaitlistStore()
+	}, userStore)
 
 	// Handlers
-	healthH := &handler.HealthHandler{}
+	healthH := &handler.HealthHandler{DB: dbPinger}
 	authH := handler.NewAuthHandler(oauthSvc, jwtSvc, cfg.DashboardURL)
 	vaultH := handler.NewVaultHandler(vaultStore, s3Client)
 	billingH := handler.NewBillingHandler(billingSvc)
@@ -92,6 +126,11 @@ func NewServer(cfg Config) *echo.Echo {
 	teamH := handler.NewTeamHandler(teamStore)
 	deviceH := handler.NewDeviceHandler(deviceStore)
 	auditH := handler.NewAuditHandler(auditStore)
+
+	// Wire auth handler user store for enriched /auth/me responses
+	if authUserStore != nil {
+		authH.SetUserStore(authUserStore)
+	}
 
 	// Global middleware (order matters)
 	e.Use(echoMw.RequestID())
@@ -140,6 +179,7 @@ func NewServer(cfg Config) *echo.Echo {
 	v1.GET("/auth/github/authorize", authH.GitHubAuthorize)
 	v1.GET("/auth/github/callback", authH.GitHubCallback)
 	v1.POST("/auth/refresh", authH.RefreshToken)
+	v1.POST("/auth/exchange", authH.Exchange)
 
 	// Authenticated routes
 	authed := v1.Group("", mw.JWTAuth(jwtSvc))
@@ -156,6 +196,7 @@ func NewServer(cfg Config) *echo.Echo {
 	// Vault routes (W3)
 	authed.GET("/vaults", vaultH.List)
 	authed.POST("/vaults", vaultH.Create)
+	authed.GET("/vaults/:id", vaultH.Get)
 	authed.POST("/vaults/:id/push", vaultH.Push, echoMw.BodyLimit("50M"))
 	authed.GET("/vaults/:id/pull", vaultH.Pull)
 	authed.DELETE("/vaults/:id", vaultH.Delete)
@@ -172,6 +213,7 @@ func NewServer(cfg Config) *echo.Echo {
 	authed.POST("/teams", teamH.Create)
 	authed.GET("/teams", teamH.List)
 	authed.POST("/teams/:id/invite", teamH.Invite)
+	authed.GET("/teams/:id/members", teamH.ListMembers)
 	authed.DELETE("/teams/:id/members/:uid", teamH.RemoveMember)
 	authed.PATCH("/teams/:id/members/:uid/role", teamH.UpdateRole)
 
@@ -186,5 +228,5 @@ func NewServer(cfg Config) *echo.Echo {
 	// Waitlist (public)
 	v1.POST("/waitlist", waitlistH.Register)
 
-	return e
+	return e, cleanup, nil
 }

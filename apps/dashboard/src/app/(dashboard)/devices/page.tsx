@@ -1,4 +1,30 @@
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { DeviceCard, DeviceCardEmpty } from "@/components/device-card";
+
 export default function DevicesPage() {
+  const queryClient = useQueryClient();
+
+  const { data: devices, isLoading } = useQuery({
+    queryKey: ["devices"],
+    queryFn: () => api.listDevices(),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.deleteDevice(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devices"] });
+    },
+  });
+
+  const handleRevoke = (id: string) => {
+    if (confirm("Revoke this device? It will need to re-authenticate.")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -6,15 +32,29 @@ export default function DevicesPage() {
         <p className="text-muted text-sm mt-1">Registered devices for vault sync</p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-dashed border-border p-8 flex flex-col items-center text-center text-muted">
-          <span className="font-mono text-3xl mb-3">⊞</span>
-          <p className="text-sm font-medium">No devices registered</p>
-          <p className="text-xs mt-1">
-            Devices are registered when you run <code className="font-mono text-accent">tene login</code>
-          </p>
+      {deleteMutation.isError && (
+        <div className="rounded-lg border border-danger/30 bg-danger/10 p-3 text-sm text-danger">
+          {deleteMutation.error instanceof Error ? deleteMutation.error.message : "Failed to revoke device"}
         </div>
-      </div>
+      )}
+
+      {isLoading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-xl border border-border bg-surface p-5 animate-pulse h-28" />
+          ))}
+        </div>
+      ) : !devices || devices.length === 0 ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <DeviceCardEmpty />
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {devices.map((device) => (
+            <DeviceCard key={device.id} device={device} onRevoke={handleRevoke} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

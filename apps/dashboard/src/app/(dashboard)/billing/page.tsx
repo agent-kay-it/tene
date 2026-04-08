@@ -1,6 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import { UsageBar } from "@/components/usage-bar";
+import { useAuthStore } from "@/lib/auth-store";
+import { api } from "@/lib/api";
 
 export default function BillingPage() {
+  const user = useAuthStore((s) => s.user);
+  const [upgrading, setUpgrading] = useState(false);
   return (
     <div className="space-y-6">
       <div>
@@ -41,8 +48,20 @@ export default function BillingPage() {
               <li className="flex items-center gap-2"><span className="text-accent">✓</span> Team secret sharing + RBAC</li>
               <li className="flex items-center gap-2"><span className="text-accent">✓</span> Full audit log</li>
             </ul>
-            <button className="mt-6 w-full py-2.5 rounded-lg bg-accent text-background font-medium text-sm hover:bg-accent-dim transition-colors active:scale-[0.98]">
-              Upgrade to Pro
+            <button
+              disabled={upgrading}
+              onClick={async () => {
+                setUpgrading(true);
+                try {
+                  const { checkout_url } = await api.createCheckout(user?.email || "");
+                  window.location.href = checkout_url;
+                } catch {
+                  setUpgrading(false);
+                }
+              }}
+              className="mt-6 w-full py-2.5 rounded-lg bg-accent text-background font-medium text-sm hover:bg-accent-dim transition-colors active:scale-[0.98] disabled:opacity-50"
+            >
+              {upgrading ? "Redirecting..." : "Upgrade to Pro"}
             </button>
           </div>
         </div>

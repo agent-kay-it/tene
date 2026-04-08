@@ -41,6 +41,25 @@ func NewVaultHandler(store VaultStore, s3 *storage.S3Client) *VaultHandler {
 	return &VaultHandler{store: store, storage: s3}
 }
 
+// Get returns a single vault by ID for the authenticated user.
+func (h *VaultHandler) Get(c echo.Context) error {
+	claims := middleware.GetClaims(c)
+	if claims == nil {
+		return response.Err(c, domain.ErrUnauthorized)
+	}
+	if claims.Plan != "pro" {
+		return response.Err(c, domain.ErrProPlanRequired)
+	}
+
+	vaultID := c.Param("id")
+	vault, err := h.store.GetVault(vaultID, claims.UserID)
+	if err != nil {
+		return response.Err(c, err)
+	}
+
+	return response.OK(c, http.StatusOK, vault)
+}
+
 // List returns all vaults for the authenticated user.
 func (h *VaultHandler) List(c echo.Context) error {
 	claims := middleware.GetClaims(c)
@@ -223,8 +242,10 @@ func (h *VaultHandler) Delete(c echo.Context) error {
 	}
 
 	// Delete S3 blob (best effort, log failures)
-	if err := h.storage.Delete(c.Request().Context(), vault.S3Key); err != nil {
-		slog.Error("vault.delete.s3_failed", "vault_id", vaultID, "s3_key", vault.S3Key, "error", err)
+	if h.storage != nil {
+		if err := h.storage.Delete(c.Request().Context(), vault.S3Key); err != nil {
+			slog.Error("vault.delete.s3_failed", "vault_id", vaultID, "s3_key", vault.S3Key, "error", err)
+		}
 	}
 
 	if err := h.store.DeleteVault(vaultID, claims.UserID); err != nil {

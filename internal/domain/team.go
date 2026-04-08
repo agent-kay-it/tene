@@ -9,6 +9,8 @@ type Team struct {
 	Slug                string    `json:"slug"`
 	OwnerID             string    `json:"owner_id"`
 	LemonSubscriptionID string    `json:"lemon_subscription_id,omitempty"`
+	RotationVersion     int64     `json:"rotation_version"`
+	RotationPending     bool      `json:"rotation_pending"`
 	CreatedAt           time.Time `json:"created_at"`
 	UpdatedAt           time.Time `json:"updated_at"`
 }
