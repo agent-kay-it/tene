@@ -21,7 +21,9 @@ start_landing() {
   echo "  Starting Landing (port 3000)..."
   cd apps/web
   [ ! -d "node_modules" ] && npm install --silent
-  NEXT_PUBLIC_API_URL=https://api.tene.sh npx next dev --port 3000 > /tmp/tene-landing.log 2>&1 &
+  NEXT_PUBLIC_API_URL="$(tene get API_URL --env local 2>/dev/null || echo http://localhost:8080)" \
+  NEXT_PUBLIC_DASHBOARD_URL="$(tene get DASHBOARD_URL --env local 2>/dev/null || echo http://localhost:3001)" \
+  npx next dev --port 3000 > /tmp/tene-landing.log 2>&1 &
   echo $! >> "$PIDS_FILE"
   cd ../..
   echo "  ✓ Landing: http://localhost:3000"
