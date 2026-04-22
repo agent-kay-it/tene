@@ -1,8 +1,21 @@
 # tene-cli skill — expected behavior tests
 
-These are not automated tests; they're documented scenarios the skill should
-handle correctly. A reviewer can walk through each one manually by pasting
-the **Input** into a Claude Code session that has this skill installed.
+Documented scenarios the skill should handle correctly. Each scenario is
+automated in two ways:
+
+- `scripts/eval_tene_skill.py` — Python + Anthropic SDK; runs all 6 cases
+  against a live Claude model and scores via regex assertions. Run with:
+  `tene run -- python3 scripts/eval_tene_skill.py`
+- `evals/tene-skill.promptfoo.yaml` — same 6 cases in promptfoo format.
+  Run with: `tene run -- npx promptfoo@latest eval -c evals/tene-skill.promptfoo.yaml`
+
+CI (`.github/workflows/skill-eval.yml`) runs both on every PR touching
+`skills/tene-cli/` or the eval artifacts. An offline self-test
+(`scripts/selftest_eval_assertions.py`) validates the regex matchers
+against 15 synthetic good/bad responses with no API cost.
+
+A reviewer can still walk through each scenario manually by pasting the
+**Input** into a Claude Code session that has this skill installed.
 
 ## Test 1: List existing secrets safely
 

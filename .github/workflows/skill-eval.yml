@@ -1,0 +1,153 @@
+name: Skill Eval
+
+# Runs the behavioral eval for the tene-cli ClawHub skill.
+#
+# Two layers:
+#   1. assertions-selftest (always runs, no API cost) — verifies the regex
+#      matcher logic in scripts/eval_tene_skill.py is correct.
+#   2. live-eval (needs ANTHROPIC_API_KEY secret) — runs the eval against
+#      claude-haiku-4-5 by default. Skipped on forks / without the secret.
+
+on:
+  push:
+    branches: [main, staging]
+    paths:
+      - "skills/tene-cli/**"
+      - "scripts/eval_tene_skill.py"
+      - "scripts/selftest_eval_assertions.py"
+      - "evals/tene-skill.promptfoo.yaml"
+      - ".github/workflows/skill-eval.yml"
+  pull_request:
+    paths:
+      - "skills/tene-cli/**"
+      - "scripts/eval_tene_skill.py"
+      - "scripts/selftest_eval_assertions.py"
+      - "evals/tene-skill.promptfoo.yaml"
+      - ".github/workflows/skill-eval.yml"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Model to evaluate against"
+        required: false
+        default: claude-haiku-4-5
+        type: choice
+        options:
+          - claude-haiku-4-5
+          - claude-sonnet-4-6
+          - claude-opus-4-7
+
+permissions:
+  contents: read
+
+jobs:
+  assertions-selftest:
+    name: Offline self-test (regex logic)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Structural checks
+        run: |
+          test -f skills/tene-cli/SKILL.md
+          test -f evals/tene-skill.promptfoo.yaml
+          test -f scripts/eval_tene_skill.py
+          test $(du -sk skills/tene-cli | cut -f1) -lt 51200   # < 50MB
+          echo "tene-cli" | grep -Eq '^[a-z0-9][a-z0-9-]*$'
+      - name: YAML frontmatter validity
+        run: |
+          python3 - <<'PY'
+          import sys
+          try:
+              import yaml
+          except ImportError:
+              import subprocess
+              subprocess.check_call([sys.executable, "-m", "pip", "install", "pyyaml"])
+              import yaml
+          content = open("skills/tene-cli/SKILL.md").read()
+          assert content.startswith("---\n")
+          end = content.index("\n---\n", 4)
+          fm = yaml.safe_load(content[4:end])
+          assert fm["name"] == "tene-cli"
+          assert fm["version"] == "1.0.0"
+          mo = fm["metadata"]["openclaw"]
+          assert mo["requires"]["bins"] == ["tene"]
+          assert "env" not in mo["requires"]
+          assert mo["install"][0]["kind"] == "download"
+          print("SKILL.md frontmatter: OK")
+          # Also validate the promptfoo config
+          pf = yaml.safe_load(open("evals/tene-skill.promptfoo.yaml"))
+          assert len(pf["tests"]) == 6
+          print(f"promptfoo config: {len(pf['tests'])} tests")
+          PY
+      - name: Run assertion self-test
+        run: python3 scripts/selftest_eval_assertions.py
+
+  live-eval-python:
+    name: Live eval (Python — Claude API)
+    needs: assertions-selftest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      EVAL_MODEL: ${{ github.event.inputs.model || 'claude-haiku-4-5' }}
+      EVAL_PASS_THRESHOLD: "0.83"
+      EVAL_JSON_OUT: "eval-results.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check API key
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::warning::ANTHROPIC_API_KEY secret not set — live eval skipped."
+            echo "SKIP=1" >> $GITHUB_ENV
+          fi
+      - name: Install anthropic SDK
+        if: env.SKIP != '1'
+        run: pip install 'anthropic>=0.40'
+      - name: Run eval
+        if: env.SKIP != '1'
+        run: python3 scripts/eval_tene_skill.py
+      - name: Upload JSON report
+        if: env.SKIP != '1' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-python-${{ env.EVAL_MODEL }}
+          path: eval-results.json
+          if-no-files-found: ignore
+
+  live-eval-promptfoo:
+    name: Live eval (promptfoo)
+    needs: assertions-selftest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check API key
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::warning::ANTHROPIC_API_KEY secret not set — promptfoo eval skipped."
+            echo "SKIP=1" >> $GITHUB_ENV
+          fi
+      - name: Run promptfoo
+        if: env.SKIP != '1'
+        run: |
+          npx --yes promptfoo@latest eval \
+            -c evals/tene-skill.promptfoo.yaml \
+            --no-cache \
+            --output eval-results-promptfoo.json
+      - name: Upload promptfoo report
+        if: env.SKIP != '1' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-promptfoo
+          path: eval-results-promptfoo.json
+          if-no-files-found: ignore
