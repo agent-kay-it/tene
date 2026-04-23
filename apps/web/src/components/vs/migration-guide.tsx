@@ -7,7 +7,7 @@ type Props = {
 export function MigrationGuide({ migration }: Props) {
   return (
     <section className="px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-3xl">
         <h2 className="text-2xl font-bold sm:text-3xl">{migration.title}</h2>
         <p className="mt-3 text-muted">{migration.summary}</p>
 

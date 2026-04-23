@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest an idea for tene
+title: "[feat]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the pain you're experiencing. Avoid proposed solutions here.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like tene to do? Commands, flags, behavior?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Doppler, Vault, dotenv-vault, custom scripts, etc.
+  - type: checkboxes
+    id: fit
+    attributes:
+      label: Does this fit tene's scope?
+      description: |
+        Tene is local-first, CLI-only, and AI-safe by design. Cloud-only
+        features or GUI wrappers are out of scope for the core CLI.
+      options:
+        - label: Yes — this is local-first / CLI / AI-safety related
+          required: true

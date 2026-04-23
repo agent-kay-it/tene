@@ -2,7 +2,18 @@
 
 // Design Ref: §2.4 T4 — Wraps shiki-rendered <pre> with hover copy button.
 // Fires blog_copy_code on click (FR-32).
-import { useRef, useState } from "react";
+//
+// Width/overflow behavior (fix for O3 + O4):
+//   - shiki injects `<pre style="background-color:#24292e">` as inline style;
+//     inline > className, so `bg-surface-2` was losing. We strip shiki's inline
+//     background here so our Tailwind class wins. globals.css also enforces it
+//     with !important as a safety net for any shiki output elsewhere.
+//   - The wrapper `<div>` gets `min-w-0` so when this wrapper sits inside a
+//     CSS grid cell, the grid track cannot grow to accommodate a long code
+//     line. Combined with `overflow-x-auto` on the <pre>, long lines scroll
+//     *inside* the block rather than blowing out the page width.
+
+import { useRef, useState, type CSSProperties } from "react";
 import { track } from "@/lib/track";
 
 type Props = {
@@ -11,7 +22,21 @@ type Props = {
   "data-language"?: string;
 } & React.HTMLAttributes<HTMLPreElement>;
 
-export function CodeBlockWrapper({ children, slug, ...rest }: Props) {
+function stripBackground(style?: CSSProperties): CSSProperties | undefined {
+  if (!style) return undefined;
+  // Strip shiki-injected background so our Tailwind `bg-surface-2` wins.
+  // We keep color/other tokens so shiki's foreground theming stays intact.
+  const { background: _bg, backgroundColor: _bgc, ...rest } = style;
+  return rest;
+}
+
+export function CodeBlockWrapper({
+  children,
+  slug,
+  style,
+  className,
+  ...rest
+}: Props) {
   const ref = useRef<HTMLPreElement>(null);
   const [copied, setCopied] = useState(false);
 
@@ -39,12 +64,24 @@ export function CodeBlockWrapper({ children, slug, ...rest }: Props) {
     }
   }
 
+  // Merge shiki's className (`shiki github-dark ...`) with our layout
+  // classes — keep shiki for theme scoping AND get our overflow/border/bg.
+  // Without this, `{...rest}` spread would overwrite our className prop
+  // and kill `overflow-x-auto`, letting long code lines blow out the page.
+  const mergedClassName = [
+    "overflow-x-auto rounded-lg border border-border bg-surface-2 p-4 text-sm",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="group relative my-6">
+    <div className="group relative my-6 min-w-0">
       <pre
         ref={ref}
-        className="overflow-x-auto rounded-lg border border-border bg-surface-2 p-4 text-sm"
         {...rest}
+        className={mergedClassName}
+        style={stripBackground(style)}
       >
         {children}
       </pre>

@@ -1,0 +1,66 @@
+name: Bug report
+description: Something isn't working as documented
+title: "[bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in the details below.
+        **Do not paste real secret values anywhere in this issue.**
+  - type: input
+    id: version
+    attributes:
+      label: tene version
+      description: Output of `tene version`
+      placeholder: "tene version v1.0.4"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: "macOS 14.5 (Apple Silicon)"
+    validations:
+      required: true
+  - type: input
+    id: install_method
+    attributes:
+      label: Install method
+      placeholder: "brew / curl install.sh / go install / docker / build-from-source"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Exact commands and inputs
+      placeholder: |
+        1. tene init
+        2. tene set FOO bar
+        3. tene run -- ...
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior (include error message verbatim)
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have searched existing issues for duplicates
+          required: true
+        - label: I have NOT pasted any real secret values in this issue
+          required: true

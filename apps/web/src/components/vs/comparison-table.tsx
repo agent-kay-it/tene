@@ -8,7 +8,7 @@ type Props = {
 export function ComparisonTable({ competitorName, rows }: Props) {
   return (
     <section className="px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-3xl">
         <h2 className="text-2xl font-bold sm:text-3xl">Side-by-side</h2>
         <p className="mt-3 text-muted">
           Feature-by-feature comparison. Every row is sourced from the official

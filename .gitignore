@@ -16,6 +16,12 @@ bin/
 /server
 /tene-dev
 
+# Generated at release time by GoReleaser `before:` hooks
+# (shell completions + man pages — do not commit; goreleaser rebuilds them
+#  into the release archive every time)
+/completions/
+/manpages/
+
 # Terraform
 infra/terraform/environments/**/.terraform/
 infra/terraform/environments/**/terraform.tfstate*

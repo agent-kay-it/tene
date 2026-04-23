@@ -17,7 +17,7 @@ export function RelatedPosts({ fromSlug, posts }: Props) {
 
   return (
     <section className="px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-3xl">
         <h2 className="text-2xl font-bold sm:text-3xl">Related articles</h2>
         <p className="mt-3 text-muted">
           More from the tene Tech Blog on related topics.

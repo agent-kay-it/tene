@@ -8,10 +8,12 @@ type Props = {
 
 export function ComparisonHero({ comparison }: Props) {
   return (
-    <section className="relative px-4 pt-28 pb-16 sm:px-6">
+    // Top padding is `pt-4` (not `pt-28`) because `<Breadcrumb />` renders
+    // just above this section and already carries the fixed-nav clearance.
+    <section className="relative px-4 pt-4 pb-16 sm:px-6">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent" />
 
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
+      <div className="relative z-10 mx-auto max-w-3xl text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted">
           <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
           Comparison

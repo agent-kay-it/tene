@@ -179,18 +179,17 @@ Your secrets are encrypted locally with XChaCha20-Poly1305. The master key is de
 | `tene version` | Print version number |
 | `tene update` | Update to latest version |
 
-### Cloud Commands (requires [app.tene.sh](https://app.tene.sh) account)
+### Cloud Commands _(Coming soon — currently disabled in the v1.x CLI)_
 
-| Command | Description |
-|---------|-------------|
-| `tene login` | OAuth login to Tene Cloud |
-| `tene push` | Encrypt and upload vault to cloud |
-| `tene pull` | Download and decrypt remote vault |
-| `tene sync` | Push + Pull combined (Pro plan) |
-| `tene team create` | Create team + generate project key |
-| `tene team invite` | Invite member with X25519 key wrapping |
-| `tene billing` | View subscription status |
-| `tene billing upgrade` | Open checkout page |
+> Cloud features (team sync, shared vaults, billing) are **in beta redesign**
+> and temporarily removed from the released CLI to keep the local-first core
+> surface minimal. When they return, they will live at [app.tene.sh](https://app.tene.sh).
+> Join the waitlist at [tene.sh](https://tene.sh).
+>
+> If you run `tene login` / `tene push` / `tene pull` / `tene sync` /
+> `tene team` / `tene billing` and see `unknown command`, that is expected
+> for now. The local CLI is fully functional without them — every feature
+> above works offline, forever, for free.
 
 ### Global Flags
 

@@ -3,6 +3,14 @@ version: 2
 before:
   hooks:
     - go mod tidy
+    # Shell completions for Homebrew / packaged shells
+    - mkdir -p completions
+    - sh -c "go run ./cmd/tene completion bash > completions/tene.bash"
+    - sh -c "go run ./cmd/tene completion zsh > completions/_tene"
+    - sh -c "go run ./cmd/tene completion fish > completions/tene.fish"
+    # Man page generation (written to manpages/tene.1)
+    - mkdir -p manpages
+    - sh -c "go run ./scripts/gen-manpage.go"
 
 builds:
   - id: tene
@@ -36,6 +44,21 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - src: completions/*
+        dst: completions
+        strip_parent: true
+        info:
+          mode: 0644
+      - src: manpages/*
+        dst: manpages
+        strip_parent: true
+        info:
+          mode: 0644
+      - LICENSE
+      - README.md
+      - SECURITY.md
+      - CHANGELOG.md
 
 checksum:
   name_template: 'checksums.txt'
@@ -63,7 +86,98 @@ release:
   prerelease: auto
   name_template: "v{{.Version}}"
 
-# S3 업로드
+# Homebrew tap — publishes Formula/tene.rb to tomo-kay/homebrew-tene on each
+# stable release. Users then run: brew install tomo-kay/tene/tene
+brews:
+  - name: tene
+    homepage: "https://tene.sh"
+    description: "Local-first encrypted secret manager CLI for AI-safe developer workflows"
+    license: "MIT"
+    repository:
+      owner: tomo-kay
+      name: homebrew-tene
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    commit_author:
+      name: goreleaserbot
+      email: bot@tene.sh
+    commit_msg_template: "chore(tap): bump tene to {{ .Tag }}"
+    skip_upload: auto
+    install: |
+      bin.install "tene"
+      bash_completion.install "completions/tene.bash" => "tene"
+      zsh_completion.install "completions/_tene"
+      fish_completion.install "completions/tene.fish"
+      man1.install "manpages/tene.1"
+    test: |
+      system "#{bin}/tene", "version"
+    caveats: |
+      Get started:
+        tene init
+
+      Documentation:
+        https://github.com/tomo-kay/tene#readme
+
+      For AI agents using this project:
+        https://tene.sh/llms.txt
+
+# Docker images published to GitHub Container Registry (GHCR).
+# Multi-arch via docker_manifests below.
+dockers:
+  - image_templates:
+      - "ghcr.io/tomo-kay/tene:{{ .Tag }}-amd64"
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}-amd64"
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}.{{ .Minor }}-amd64"
+      - "ghcr.io/tomo-kay/tene:latest-amd64"
+    dockerfile: Dockerfile
+    use: buildx
+    goos: linux
+    goarch: amd64
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.source=https://github.com/tomo-kay/tene"
+      - "--label=org.opencontainers.image.licenses=MIT"
+  - image_templates:
+      - "ghcr.io/tomo-kay/tene:{{ .Tag }}-arm64"
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}-arm64"
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}.{{ .Minor }}-arm64"
+      - "ghcr.io/tomo-kay/tene:latest-arm64"
+    dockerfile: Dockerfile
+    use: buildx
+    goos: linux
+    goarch: arm64
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.source=https://github.com/tomo-kay/tene"
+      - "--label=org.opencontainers.image.licenses=MIT"
+
+docker_manifests:
+  - name_template: "ghcr.io/tomo-kay/tene:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/tomo-kay/tene:{{ .Tag }}-amd64"
+      - "ghcr.io/tomo-kay/tene:{{ .Tag }}-arm64"
+  - name_template: "ghcr.io/tomo-kay/tene:v{{ .Major }}"
+    image_templates:
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}-amd64"
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}-arm64"
+  - name_template: "ghcr.io/tomo-kay/tene:v{{ .Major }}.{{ .Minor }}"
+    image_templates:
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}.{{ .Minor }}-amd64"
+      - "ghcr.io/tomo-kay/tene:v{{ .Major }}.{{ .Minor }}-arm64"
+  - name_template: "ghcr.io/tomo-kay/tene:latest"
+    image_templates:
+      - "ghcr.io/tomo-kay/tene:latest-amd64"
+      - "ghcr.io/tomo-kay/tene:latest-arm64"
+
+# S3 upload (existing; legacy curl|sh install path)
 blobs:
   - provider: s3
     bucket: tene-releases
