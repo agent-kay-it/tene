@@ -119,7 +119,14 @@ main() {
 
   info ""
   info "  tene v${version} installed successfully!"
-  info "  Run 'tene init' to get started."
+  info ""
+  info "  Next step: tene init"
+  info ""
+  info "  Documentation:"
+  info "    README:    https://github.com/tomo-kay/tene#readme"
+  info "    CLI ref:   https://tene.sh/cli"
+  info "    AI index:  https://tene.sh/llms.txt"
+  info "    Issues:    https://github.com/tomo-kay/tene/issues"
 }
 
 main

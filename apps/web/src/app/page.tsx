@@ -3,8 +3,8 @@ import { Features } from "@/components/features";
 import { Comparison } from "@/components/comparison";
 import { HowItWorks } from "@/components/how-it-works";
 import { Security } from "@/components/security";
+import { Trust } from "@/components/trust";
 import { CTA } from "@/components/cta";
-import { Pricing } from "@/components/pricing";
 import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
 import { FAQ } from "@/components/faq";
@@ -25,6 +25,7 @@ export default function Home() {
         <Features />
         <HowItWorks />
         <Security />
+        <Trust />
         <Comparison />
         {/* <Pricing /> */}
         <FAQ />

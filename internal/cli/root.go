@@ -47,9 +47,26 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "tene",
-	Short:   "Agentic Secret Runtime -- local-first encrypted secret management",
-	Version: version,
+	Use:   "tene",
+	Short: "Agentic Secret Runtime -- local-first encrypted secret management",
+	Long: `tene is a local-first encrypted secret manager CLI. It encrypts your
+secrets with XChaCha20-Poly1305 and injects them at runtime so AI agents
+(Claude Code, Cursor, Windsurf, Gemini, Codex, Copilot) never see plaintext.
+
+Typical workflow:
+
+  tene init                                 # create encrypted vault
+  tene set STRIPE_KEY sk_test_xxx           # store a secret
+  tene run -- npm start                     # run with secrets injected
+
+Resources:
+  AI index:    https://tene.sh/llms.txt
+  CLI ref:     https://tene.sh/cli
+  Docs:        https://github.com/tomo-kay/tene#readme
+  Issues:      https://github.com/tomo-kay/tene/issues
+  Discussions: https://github.com/tomo-kay/tene/discussions
+`,
+	Version:       version,
 	SilenceErrors: true,
 	SilenceUsage:  true,
 }
@@ -76,6 +93,7 @@ func init() {
 	rootCmd.AddCommand(whoamiCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(completionCmd)
 
 	// Cloud commands — removed from CLI while being redesigned.
 	// Code preserved in: login.go, logout.go, push.go, pull.go,
@@ -221,4 +239,9 @@ func envOrDefault(key, fallback string) string {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+// RootCmd returns the root cobra command. Useful for docs/manpage generation.
+func RootCmd() *cobra.Command {
+	return rootCmd
 }

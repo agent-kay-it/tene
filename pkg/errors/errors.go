@@ -57,3 +57,14 @@ func IsTeneError(err error) (*TeneError, bool) {
 	}
 	return nil, false
 }
+
+// ErrStdoutSecretBlocked is returned by `tene get` when stdout is not a TTY
+// and the caller has not explicitly opted into plaintext output. See
+// internal/cli/get.go and docs/cli-reference.md#tene-get.
+var ErrStdoutSecretBlocked = New(
+	"STDOUT_SECRET_BLOCKED",
+	"Refusing to print secret to non-TTY stdout. "+
+		"Use `tene run -- <cmd>` (safer), or pass `--unsafe-stdout` or set "+
+		"TENE_ALLOW_STDOUT_SECRETS=1 if you really need plaintext piped output.",
+	2,
+)

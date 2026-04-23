@@ -10,6 +10,7 @@ import { MigrationGuide } from "@/components/vs/migration-guide";
 import { ComparisonFaqList } from "@/components/vs/comparison-faq";
 import { RelatedComparisons } from "@/components/vs/related-comparisons";
 import { ComparisonJsonLd } from "@/components/seo/software-jsonld";
+import { Breadcrumb } from "@/components/breadcrumb";
 import {
   getAllComparisonSlugs,
   getComparison,
@@ -100,6 +101,13 @@ export default async function ComparisonPage({
 
       <Nav />
       <main className="relative z-10">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Compare", href: "/vs" },
+            { label: `vs ${data.competitorName}` },
+          ]}
+        />
         <ComparisonHero comparison={data} />
         <ComparisonNarrative
           intro={data.intro}

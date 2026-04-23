@@ -45,6 +45,13 @@ func resetFlags() {
 	flagNoColor = false
 	flagNoKeychain = false
 
+	// get command flags — default to opting in to plaintext stdout for tests.
+	// In production, `tene get` refuses non-TTY stdout by default (U-1), but
+	// the test harness swaps os.Stdout for a pipe so every run is non-TTY.
+	// The U-1 guard itself is exercised in get_guard_test.go where this is
+	// explicitly overridden to `false`.
+	flagUnsafeStdout = true
+
 	// set command flags
 	setFlagStdin = false
 	setFlagOverwrite = false

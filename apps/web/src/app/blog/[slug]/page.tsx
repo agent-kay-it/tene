@@ -15,6 +15,7 @@ import { RelatedPosts } from "@/components/blog/related-posts";
 import { ReadProgressTracker } from "@/components/blog/read-progress-tracker";
 import { BlogPostingJsonLd } from "@/components/seo/article-jsonld";
 import { FaqJsonLd } from "@/components/seo/faq-jsonld";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { useMDXComponents } from "../../../../mdx-components";
 import {
   getAllPostSlugs,
@@ -100,11 +101,31 @@ export default async function BlogPostPage({
 
       <Nav />
       <main className="relative z-10">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Blog", href: "/blog" },
+            { label: post.meta.title },
+          ]}
+        />
         <PostHero meta={post.meta} />
 
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 pb-12 sm:px-6 lg:grid-cols-[1fr,minmax(auto,720px),220px]">
-          <div className="hidden lg:block" aria-hidden="true" />
-
+        {/*
+         * Layout grid:
+         *  - Up to `lg`, the article fills the natural column (max-w-3xl matches
+         *    the hero / footer / related-posts widths so the whole page reads as
+         *    one uniform column).
+         *  - At `lg`+, we widen to max-w-5xl and split into
+         *    [720px article] + [220px TOC], with a sticky TOC on the right.
+         *
+         * Why `minmax(0, 720px)` (not `minmax(auto, 720px)`): `auto` takes the
+         * column's min-content, which for long code blocks = the widest line in
+         * the code. That would let the column (and therefore the page) expand
+         * beyond 720px and cause horizontal scroll. `0` as the floor + the
+         * `<article className="min-w-0">` below lets inner `<pre overflow-x-auto>`
+         * handle overflow itself, preventing page-level scroll.
+         */}
+        <div className="mx-auto grid w-full max-w-3xl gap-8 px-4 pb-12 sm:px-6 lg:max-w-5xl lg:grid-cols-[minmax(0,720px)_220px]">
           <article className="min-w-0">
             <MDXRemote
               source={post.content}

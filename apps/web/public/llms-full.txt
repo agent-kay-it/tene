@@ -351,6 +351,7 @@ developer + CI loop.
 
 - Install script:    https://tene.sh/install.sh
 - Short summary:     https://tene.sh/llms.txt
+- CLI reference:     https://tene.sh/cli
 - Comparison pages:  https://tene.sh/vs/{dotenv,doppler,dotenv-vault,infisical,vault}
 - Tech Blog:         https://tene.sh/blog
 - RSS feed:          https://tene.sh/blog/rss.xml
