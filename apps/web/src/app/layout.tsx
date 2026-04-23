@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Tene — Your .env is not a secret. AI can read it.",
   description:
-    "Your .env is not a secret — AI can read it. Tene encrypts secrets locally and injects them at runtime so AI agents never see the values. XChaCha20-Poly1305 encryption. No server, no signup, free and open source.",
+    "Tene encrypts your API keys locally and injects them at runtime so Claude Code, Cursor, and other AI agents never see plaintext. MIT, no server, free.",
   keywords: [
     "secret management",
     "API key management",
@@ -82,19 +82,71 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Organization",
+      "@id": "https://tene.sh/#organization",
+      name: "Tene",
+      url: "https://tene.sh",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://tene.sh/logo.svg",
+        width: 256,
+        height: 256,
+      },
+      sameAs: [
+        "https://github.com/tomo-kay/tene",
+        "https://github.com/tomo-kay",
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "Support",
+        url: "https://github.com/tomo-kay/tene/issues",
+      },
+      founder: {
+        "@type": "Person",
+        name: "tomo-kay",
+        url: "https://github.com/tomo-kay",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://tene.sh/#website",
+      url: "https://tene.sh",
+      name: "Tene",
+      publisher: { "@id": "https://tene.sh/#organization" },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: "https://tene.sh/blog?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
+      inLanguage: "en-US",
+    },
+    {
       "@type": "SoftwareApplication",
+      "@id": "https://tene.sh/#software",
       name: "Tene",
       applicationCategory: "DeveloperApplication",
+      applicationSubCategory: "Secret Management CLI",
       operatingSystem: "macOS, Linux, Windows (WSL)",
       description:
-        "Your .env is not a secret — AI can read it. Tene encrypts secrets locally and injects them at runtime so AI agents never see the values.",
+        "Tene encrypts your API keys locally and injects them at runtime so Claude Code, Cursor, and other AI agents never see plaintext. MIT, no server, free.",
       url: "https://tene.sh",
+      downloadUrl: "https://tene.sh/install.sh",
+      softwareVersion: "latest",
       offers: {
         "@type": "Offer",
         price: "0",
         priceCurrency: "USD",
       },
       license: "https://opensource.org/licenses/MIT",
+      author: {
+        "@type": "Person",
+        name: "tomo-kay",
+        url: "https://github.com/tomo-kay",
+      },
+      publisher: { "@id": "https://tene.sh/#organization" },
     },
     {
       "@type": "FAQPage",
@@ -189,6 +241,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <link rel="ai-index" href="https://tene.sh/llms.txt" />
+        <link
+          rel="alternate"
+          type="text/plain"
+          title="LLM-optimized summary (llms.txt)"
+          href="https://tene.sh/llms.txt"
+        />
+        <link
+          rel="alternate"
+          type="text/plain"
+          title="LLM-optimized full reference (llms-full.txt)"
+          href="https://tene.sh/llms-full.txt"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

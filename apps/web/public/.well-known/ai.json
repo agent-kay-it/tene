@@ -1,0 +1,19 @@
+{
+  "name": "tene",
+  "description": "Local-first encrypted secret manager CLI for AI-safe developer workflows. Encrypts secrets with XChaCha20-Poly1305 and injects them at runtime so AI agents (Claude Code, Cursor, Windsurf, Gemini, Codex, Copilot) never see plaintext values.",
+  "llms_text_urls": [
+    "https://tene.sh/llms.txt",
+    "https://tene.sh/llms-full.txt"
+  ],
+  "repository": "https://github.com/tomo-kay/tene",
+  "documentation": "https://github.com/tomo-kay/tene#readme",
+  "cli_reference": "https://tene.sh/cli",
+  "license": "MIT",
+  "contact": "https://github.com/tomo-kay/tene/issues",
+  "install": {
+    "curl": "curl -sSfL https://tene.sh/install.sh | sh",
+    "brew": "brew install tomo-kay/tene/tene",
+    "go": "go install github.com/tomo-kay/tene/cmd/tene@latest",
+    "docker": "docker run ghcr.io/tomo-kay/tene:latest"
+  }
+}

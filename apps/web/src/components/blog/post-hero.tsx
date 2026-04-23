@@ -19,7 +19,11 @@ function formatDate(iso: string): string {
 
 export function PostHero({ meta }: Props) {
   return (
-    <header className="px-4 pt-28 pb-8 sm:px-6">
+    // Top padding is `pt-4` (not `pt-28`) because `<Breadcrumb />` renders
+    // just above this header and already carries the fixed-nav clearance.
+    // Keeping pt-28 here would double-space the gap between breadcrumb and
+    // article title.
+    <header className="px-4 pt-4 pb-8 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <time dateTime={meta.publishedAt}>{formatDate(meta.publishedAt)}</time>

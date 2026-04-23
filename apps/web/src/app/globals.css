@@ -100,3 +100,40 @@ body {
   animation: blink 1s step-end infinite;
   color: var(--accent);
 }
+
+/*
+ * Code-block styling — blog MDX + /cli reference.
+ *
+ * `@shikijs/rehype` renders every highlighted block as
+ *   `<pre class="shiki ..." style="background-color:#...">`
+ * and the inline `style` attribute wins over our Tailwind `bg-surface-2`.
+ * We strip the inline background in CodeBlockWrapper, but we also enforce it
+ * here so any other shiki-rendered block on the site (/cli, MDX in other
+ * routes) keeps the same `var(--surface-2)` backdrop — matching the rest of
+ * the card/surface system.
+ *
+ * Also: `shiki` emits per-line `<span class="line">display:block` spans; we
+ * make them honor the parent's `white-space` so a single long line cannot
+ * blow out the column width. The parent `<pre>` keeps `overflow-x: auto`
+ * so lines that *must* stay on one line (shell commands) scroll horizontally
+ * inside the block instead of stretching the grid column.
+ */
+pre.shiki,
+pre[class*="language-"] {
+  background-color: var(--surface-2) !important;
+  background: var(--surface-2) !important;
+  max-width: 100%;
+}
+
+pre.shiki code,
+pre[class*="language-"] code {
+  background: transparent !important;
+  display: block;
+  width: max-content;
+  min-width: 100%;
+}
+
+pre.shiki .line,
+pre[class*="language-"] .line {
+  background: transparent !important;
+}
