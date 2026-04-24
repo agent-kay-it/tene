@@ -133,6 +133,19 @@ pre[class*="language-"] code {
   min-width: 100%;
 }
 
+/* Defense-in-depth: any <code> directly inside a <pre> inside the article
+ * must inherit the <pre> background. Covers the plaintext fenced-block case
+ * where shiki adds no className on <code>, so the MDX `code` component
+ * falls back to bare rendering — but browser UA styles or a stray `bg-*`
+ * Tailwind utility elsewhere could still paint a mismatched tint. */
+article pre > code {
+  background-color: transparent !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  color: inherit;
+}
+
 pre.shiki .line,
 pre[class*="language-"] .line {
   background: transparent !important;
