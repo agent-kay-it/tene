@@ -15,12 +15,8 @@ export const metadata: Metadata = {
     "Articles on AI-safe secret management, vibe coding, developer security, local-first infrastructure, and CLI design — from the team building tene.",
   alternates: {
     canonical: "https://tene.sh/blog",
-    // FR-35 — RSS feed auto-discovery (<link rel="alternate"> in head).
-    types: {
-      "application/rss+xml": [
-        { url: "https://tene.sh/blog/rss.xml", title: "tene Tech Blog RSS" },
-      ],
-    },
+    // RSS auto-discovery moved to root layout.tsx <head> — emitted on every
+    // page (FR-35). This page no longer needs its own type entry.
   },
   openGraph: {
     title: "tene Tech Blog",

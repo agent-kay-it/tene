@@ -254,6 +254,18 @@ export default function RootLayout({
           title="LLM-optimized full reference (llms-full.txt)"
           href="https://tene.sh/llms-full.txt"
         />
+        {/* RSS feed auto-discovery — emitted on EVERY page (root layout) so
+            search-engine crawlers and RSS readers find the feed from the
+            homepage, comparison pages, tag pages, etc. Next.js Metadata API
+            shallow-replaces `alternates` per page, which would otherwise drop
+            the link on routes that set their own canonical. Direct <head>
+            injection is the single source of truth. */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="tene Tech Blog RSS"
+          href="https://tene.sh/blog/rss.xml"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
