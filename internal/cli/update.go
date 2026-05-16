@@ -204,7 +204,7 @@ type githubRelease struct {
 }
 
 func fetchFromGitHub() (*releaseInfo, error) {
-	url := "https://api.github.com/repos/tomo-kay/tene/releases/latest"
+	url := "https://api.github.com/repos/agent-kay-it/tene/releases/latest"
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

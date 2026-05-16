@@ -14,7 +14,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra/doc"
-	tenecli "github.com/tomo-kay/tene/internal/cli"
+	tenecli "github.com/agent-kay-it/tene/internal/cli"
 )
 
 func main() {

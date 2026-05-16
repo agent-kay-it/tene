@@ -123,10 +123,10 @@ main() {
   info "  Next step: tene init"
   info ""
   info "  Documentation:"
-  info "    README:    https://github.com/tomo-kay/tene#readme"
+  info "    README:    https://github.com/agent-kay-it/tene#readme"
   info "    CLI ref:   https://tene.sh/cli"
   info "    AI index:  https://tene.sh/llms.txt"
-  info "    Issues:    https://github.com/tomo-kay/tene/issues"
+  info "    Issues:    https://github.com/agent-kay-it/tene/issues"
 }
 
 main

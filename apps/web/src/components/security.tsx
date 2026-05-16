@@ -77,11 +77,11 @@ export function Security() {
               <p className="mt-1 text-sm text-muted">
                 Every line of encryption code is open source. Don&apos;t trust us — read the code.{" "}
                 <TrackedGithubLink
-                  href="https://github.com/tomo-kay/tene"
+                  href="https://github.com/agent-kay-it/tene"
                   location="security"
                   className="text-accent underline underline-offset-2 hover:text-accent-dim"
                 >
-                  github.com/tomo-kay/tene
+                  github.com/agent-kay-it/tene
                 </TrackedGithubLink>
               </p>
             </div>
