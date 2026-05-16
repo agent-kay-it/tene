@@ -93,13 +93,13 @@ const jsonLd = {
         height: 256,
       },
       sameAs: [
-        "https://github.com/tomo-kay/tene",
+        "https://github.com/agent-kay-it/tene",
         "https://agentkay.it",
       ],
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "Support",
-        url: "https://github.com/tomo-kay/tene/issues",
+        url: "https://github.com/agent-kay-it/tene/issues",
       },
       founder: {
         "@type": "Person",

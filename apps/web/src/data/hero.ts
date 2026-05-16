@@ -12,11 +12,11 @@ export const heroData = {
     install: "curl -sSfL https://tene.sh/install.sh | sh",
     primary: {
       label: "View on GitHub",
-      href: "https://github.com/tomo-kay/tene",
+      href: "https://github.com/agent-kay-it/tene",
     },
     secondary: {
       label: "Quickstart",
-      href: "https://github.com/tomo-kay/tene#quick-start",
+      href: "https://github.com/agent-kay-it/tene#quick-start",
     },
   },
 };

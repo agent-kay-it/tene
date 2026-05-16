@@ -1,7 +1,7 @@
 "use client";
 
 // Client wrapper for a GitHub anchor that fires `github_click` with a location
-// tag. Use this everywhere a `<a href="https://github.com/tomo-kay/tene">`
+// tag. Use this everywhere a `<a href="https://github.com/agent-kay-it/tene">`
 // appears in the landing page + blog + /vs pages.
 import { track } from "@/lib/track";
 

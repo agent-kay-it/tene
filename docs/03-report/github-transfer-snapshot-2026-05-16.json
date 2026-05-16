@@ -1,0 +1,22 @@
+{
+  "_meta": { "capturedAt": "2026-05-16T12:17:46Z", "source": "agent-kay-it/tene", "target": "agent-kay-it/tene" },
+  "repo":
+{"createdAt":"2026-04-06T06:33:49Z","defaultBranchRef":{"name":"main"},"description":"AI-safe secret manager CLI for Claude Code, Cursor, and other AI agents. Local-first, encrypted, no cloud.","forkCount":0,"isArchived":false,"isPrivate":false,"name":"tene","owner":{"id":"U_kgDODskb8g","login":"tomo-kay"},"sshUrl":"git@github.com:agent-kay-it/tene.git","stargazerCount":8,"updatedAt":"2026-05-13T15:03:01Z","url":"https://github.com/agent-kay-it/tene","visibility":"PUBLIC","watchers":{"totalCount":0}}
+  ,
+  "branches":
+[{"name":"main","commit":{"sha":"e1ba551e802c78154b8a696164aad11afcd4dfa8","url":"https://api.github.com/repos/agent-kay-it/tene/commits/e1ba551e802c78154b8a696164aad11afcd4dfa8"},"protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}},"protection_url":"https://api.github.com/repos/agent-kay-it/tene/branches/main/protection"},{"name":"staging","commit":{"sha":"0b4e621b21ea25dbd534de8fc5927a7959a5ca9f","url":"https://api.github.com/repos/agent-kay-it/tene/commits/0b4e621b21ea25dbd534de8fc5927a7959a5ca9f"},"protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}},"protection_url":"https://api.github.com/repos/agent-kay-it/tene/branches/staging/protection"}]  ,
+  "openPRs":
+[]
+  ,
+  "closedPRsRecent":
+[{"baseRefName":"main","headRefName":"staging","mergedAt":"2026-05-13T14:40:37Z","number":111,"title":"Release: bkit-sprint-orchestration blog + tene CLI v2 sprint plan (staging → main)"},{"baseRefName":"staging","headRefName":"feature/blog-bkit-sprint-2026q3","mergedAt":"2026-05-13T14:36:06Z","number":110,"title":"feat(blog): bkit-sprint-orchestration + tene CLI v2 sprint plan/designs"},{"baseRefName":"main","headRefName":"staging","mergedAt":"2026-05-11T07:05:27Z","number":109,"title":"Release: AI coding education essay + GSC noindex fixes (staging → main)"},{"baseRefName":"staging","headRefName":"feature/blog-vibe-coding-education","mergedAt":"2026-05-11T07:02:58Z","number":108,"title":"feat(blog): add AI coding education essay + GSC noindex fixes"},{"baseRefName":"main","headRefName":"staging","mergedAt":"2026-05-02T16:13:06Z","number":107,"title":"Release: FAQPage duplicate fix + intent-is-the-new-craft"},{"baseRefName":"staging","headRefName":"fix/faqpage-duplicate","mergedAt":"2026-05-02T16:09:34Z","number":106,"title":"fix(seo): FAQPage duplicate fix + new philosophy blog post"},{"baseRefName":"main","headRefName":"staging","mergedAt":"2026-05-01T17:02:42Z","number":105,"title":"fix(seo): emit ISO 8601 datetime with timezone for Schema.org / OG (staging → main)"},{"baseRefName":"staging","headRefName":"fix/jsonld-datetime-iso8601","mergedAt":"2026-05-01T17:00:40Z","number":104,"title":"fix(seo): emit ISO 8601 datetime with timezone for Schema.org / OG"},{"baseRefName":"main","headRefName":"staging","mergedAt":"2026-05-01T16:17:24Z","number":103,"title":"Release: GSC indexing strategy + AEO playbook"},{"baseRefName":"staging","headRefName":"feat/gsc-indexing-strategy","mergedAt":"2026-05-01T16:13:56Z","number":102,"title":"feat(seo): GSC indexing strategy + AEO playbook + supporting blog post"}]
+  ,
+  "openIssues":
+[]
+  ,
+  "secretsNames":
+{"total_count":0,"secrets":[]}  ,
+  "variables":
+{"variables":[],"total_count":0}  ,
+  "webhooks":
+[]}

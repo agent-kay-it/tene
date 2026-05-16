@@ -60,7 +60,7 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-**conduct@tene.sh** (or contact `@tomo-kay` privately on GitHub).
+**conduct@tene.sh** (or contact `@agent-kay-it` privately on GitHub).
 
 All complaints will be reviewed and investigated promptly and fairly.
 

@@ -20,7 +20,7 @@ All participation is governed by [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 ### Clone and build
 
 ```bash
-git clone https://github.com/tomo-kay/tene.git
+git clone https://github.com/agent-kay-it/tene.git
 cd tene
 go build -o tene ./cmd/tene
 go test -race ./...
@@ -53,7 +53,7 @@ TENE_MASTER_PASSWORD=devpass /path/to/tene run --no-keychain -- env | grep DEMO_
 5. **Commit message**: Conventional Commits preferred
    (`feat(cli):`, `fix(vault):`, `docs(readme):`, `chore(deps):`).
 6. **Open a PR to `staging`**. CI must pass.
-7. **Security-sensitive** changes: mention `@tomo-kay` in the PR body for
+7. **Security-sensitive** changes: mention `@agent-kay-it` in the PR body for
    dedicated review.
 
 ## Code Style

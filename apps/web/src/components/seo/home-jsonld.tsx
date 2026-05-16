@@ -39,7 +39,7 @@ const homeJsonLd = {
         {
           "@type": "HowToStep",
           name: "Install",
-          text: "Run: curl -sSfL https://tene.sh/install.sh | sh — or download from GitHub Releases (github.com/tomo-kay/tene/releases)",
+          text: "Run: curl -sSfL https://tene.sh/install.sh | sh — or download from GitHub Releases (github.com/agent-kay-it/tene/releases)",
         },
         {
           "@type": "HowToStep",
