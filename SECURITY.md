@@ -7,7 +7,7 @@ XChaCha20-Poly1305 and makes zero network calls by default.
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Instead, email **security@tene.sh** (or contact `@tomo-kay` privately on
+Instead, email **security@tene.sh** (or contact `@agent-kay-it` privately on
 GitHub if the alias is not yet live).
 
 Please include:

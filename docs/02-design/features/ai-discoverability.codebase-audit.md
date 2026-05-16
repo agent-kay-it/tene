@@ -188,7 +188,7 @@ export const metadata: Metadata = {
     "Your .env is not a secret — AI can read it. Tene encrypts secrets locally and injects them at runtime so AI agents never see the values. XChaCha20-Poly1305 encryption. No server, no signup, free and open source.",
   //   ^^^ 211자 — Google SERP 155자 컷오프 초과 ⚠️
   keywords: [ /* 15 items */ ],
-  authors: [{ name: "tomo-kay", url: "https://github.com/tomo-kay" }],
+  authors: [{ name: "tomo-kay", url: "https://github.com/agent-kay-it" }],
   // ... canonical, icons, openGraph, twitter, robots 완비
 };
 
@@ -278,7 +278,7 @@ aggregateRating:
 
 ### 2.9 GitHub — Community Health 42% 증거
 
-**실측 (`gh api repos/tomo-kay/tene/community/profile`)**:
+**실측 (`gh api repos/agent-kay-it/tene/community/profile`)**:
 ```json
 {
   "health_percentage": 42,
@@ -363,7 +363,7 @@ drwxr-xr-x@  4 popup-kay  staff   128B 4 22 15:09 workflows
 - `curl -I https://tene.sh/robots.txt` → LLM bots 포함 확인
 - `curl https://tene.sh/.well-known/ai.json` → 200
 - `brew install tomo-kay/tap/tene && tene version` → 성공
-- `docker run ghcr.io/tomo-kay/tene version` → 성공
+- `docker run ghcr.io/agent-kay-it/tene version` → 성공
 - `tene get X | cat` → exit 2 + `STDOUT_SECRET_BLOCKED`
 - `tene get X` (터미널) → 정상 출력
 - `tene completion bash` → 스크립트 출력

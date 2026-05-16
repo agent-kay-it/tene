@@ -375,13 +375,13 @@ const organizationJsonLd = {
   url: 'https://tene.sh',
   logo: 'https://tene.sh/favicon.svg',
   sameAs: [
-    'https://github.com/tomo-kay/tene',
-    'https://clawhub.ai/tomo-kay/tene-cli',
+    'https://github.com/agent-kay-it/tene',
+    'https://clawhub.ai/agent-kay-it/tene-cli',
   ],
   founder: {
     '@type': 'Person',
     name: 'Kay Kim',
-    url: 'https://github.com/tomo-kay',
+    url: 'https://github.com/agent-kay-it',
   },
 };
 
@@ -428,7 +428,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    author: { '@type': 'Person', name: post.author, url: 'https://github.com/tomo-kay' },
+    author: { '@type': 'Person', name: post.author, url: 'https://github.com/agent-kay-it' },
     publisher: { '@type': 'Organization', name: 'Tene', logo: { '@type': 'ImageObject', url: 'https://tene.sh/favicon.svg' } },
   };
 
