@@ -59,6 +59,10 @@ func resetFlags() {
 	// delete command flags
 	deleteFlagForce = false
 
+	// env delete command flag (FX2 — separate from deleteFlagForce so the
+	// two destructive verbs do not leak state into each other across runs)
+	envDeleteFlagForce = false
+
 	// export command flags
 	exportFlagFile = ""
 	exportFlagEncrypted = false
@@ -76,6 +80,16 @@ func resetFlags() {
 	initFlagWindsurf = false
 	initFlagGemini = false
 	initFlagCodex = false
+
+	// F8 audit subcommand flags
+	auditTailN = 20
+	auditShowSince = ""
+	auditShowFilter = ""
+	auditShowResource = ""
+	auditShowLimit = 200
+	auditPruneOlderThan = ""
+	auditPruneForce = false
+	auditPruneDryRun = false
 }
 
 // run executes a tene CLI command and returns stdout, stderr, error.

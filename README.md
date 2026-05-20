@@ -198,7 +198,7 @@ Your secrets are encrypted locally with XChaCha20-Poly1305. The master key is de
 | `--json` | JSON output (for AI agents and scripting) |
 | `--env <name>` | Target environment (default: active) |
 | `--quiet` | Minimal output (errors only) |
-| `--no-keychain` | Skip OS keychain (for CI/CD) |
+| `--no-keychain` | Skip OS keychain (for CI/CD). Since v1.0.14 this means *no* persistence — supply `TENE_MASTER_PASSWORD` on every call, or set `TENE_KEYFILE=/path/you/control` to opt back into a file-backed store at a per-project path |
 | `--no-color` | Disable color output |
 
 ### Supported AI Editors
@@ -212,6 +212,28 @@ Your secrets are encrypted locally with XChaCha20-Poly1305. The master key is de
 | Windsurf | `.windsurfrules` |
 | Gemini / Jules | `GEMINI.md` |
 | Codex / OpenAI | `AGENTS.md` |
+
+## Permission Tiers
+
+tene classifies every command by how much trust it needs, so most everyday
+work runs without a password prompt while value-revealing operations stay
+behind explicit unlocking.
+
+| Tier | What it touches | Password? | Examples |
+|---|---|:---:|---|
+| `metaread` | vault metadata only (key names, env names, schema info, preview substring) | no | `list`, `env *`, `permissions`, `audit tail/show`, `config`, `migrate`, `whoami`, `version` |
+| `secretwrite` | encrypts a new value into the vault, or deletes a row | yes | `set`, `import`, `init`, `delete`, `audit prune` |
+| `secretread` | decrypts an existing value (subject to `STDOUT_SECRET_BLOCKED`) | yes | `get`, `export`, `run`, `passwd`, `recover` |
+
+Run `tene permissions` for the full mapping (or `tene permissions --json`
+for machine-readable output). The classification is enforced at binary
+startup: any cobra command that lacks a tier entry panics before main()
+returns, so accidental permission regressions are caught immediately.
+
+AI assistants cannot pipe `tene get` to stdout without explicit opt-in
+(`--unsafe-stdout` or `TENE_ALLOW_STDOUT_SECRETS=1`). Prefer
+`tene run -- <command>` for agent workflows — secrets stay inside the
+child process and never enter the AI context window.
 
 ## For AI Agents
 
