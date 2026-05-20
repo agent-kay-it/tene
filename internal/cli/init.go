@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/agent-kay-it/tene/internal/claudemd"
 	"github.com/agent-kay-it/tene/internal/config"
-	"github.com/agent-kay-it/tene/pkg/crypto"
 	"github.com/agent-kay-it/tene/internal/keychain"
 	"github.com/agent-kay-it/tene/internal/recovery"
 	"github.com/agent-kay-it/tene/internal/vault"
+	"github.com/agent-kay-it/tene/pkg/crypto"
+	"github.com/spf13/cobra"
 )
 
 var initCmd = &cobra.Command{
@@ -104,10 +104,13 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 	defer func() { _ = v.Close() }()
 
-	// 6. Store metadata
-	if err := v.SetMeta("schema_version", "1"); err != nil {
-		return err
-	}
+	// 6. Store metadata.
+	//
+	// schema_version is intentionally NOT written here: vault.New has
+	// already stamped it via runMigrations() to currentSchemaVersion.
+	// Overwriting it would clobber the v2 stamp (sprint
+	// cli-ux-permission-model, F1) and trip the migration system on the
+	// next open.
 	if err := v.SetMeta("vault_version", "1"); err != nil {
 		return err
 	}
@@ -182,6 +185,15 @@ func runInit(cmd *cobra.Command, args []string) error {
 	// 13. Audit log
 	_ = v.AddAuditLog("vault.init", "", "project="+projectName)
 
+	// 13a. F4 — emit the cli.<tier>.<verb> dispatcher row that
+	// rootPersistentPreRunE skipped (vault.db did not yet exist when the
+	// dispatcher fired for init). G7 requires every CommandTier entry to
+	// produce a cli.* row per invocation; writing it here closes the
+	// gap for init specifically. Tier is hard-coded rather than looked
+	// up to keep the call independent of the auth package import graph.
+	// We use the active vault handle that init already holds open.
+	_ = v.AddAuditLog("cli.secretwrite.init", "", "")
+
 	// 14. Output
 	if flagJSON {
 		return printJSON(map[string]any{
@@ -222,6 +234,14 @@ func runInit(cmd *cobra.Command, args []string) error {
 		fmt.Println()
 		fmt.Println("  Tip: No server needed. Your secrets stay on this device.")
 		fmt.Println("       AI agents will automatically use tene.")
+		// F7 — permission + preview hints (3 lines, sprint cli-ux-permission-model).
+		// Wording is locked by plan.md F7 step 1: default preview is front=0/back=4
+		// (Q2 final 2026-05-20, prefix exposure off by default). The deprecated
+		// "first-4 + last-4" phrasing must NEVER appear here — TestInit_DoesNotMentionFirstFourLastFour
+		// is a regression guard. Hint count capped at 3 (Q4 + RISK 5 verbosity cap).
+		fmt.Println("       Run `tene permissions` to see which commands need your password.")
+		fmt.Println("       `tene list` shows last 4 chars of each value by default (no prefix exposed).")
+		fmt.Println("       Disable: `tene config preview.enabled=false`  |  Opt-in to prefix: `tene config preview.front=N`")
 		fmt.Println()
 		fmt.Println("  Docs:  https://tene.sh")
 	} else {

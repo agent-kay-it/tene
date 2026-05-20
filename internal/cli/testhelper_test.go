@@ -76,6 +76,16 @@ func resetFlags() {
 	initFlagWindsurf = false
 	initFlagGemini = false
 	initFlagCodex = false
+
+	// F8 audit subcommand flags
+	auditTailN = 20
+	auditShowSince = ""
+	auditShowFilter = ""
+	auditShowResource = ""
+	auditShowLimit = 200
+	auditPruneOlderThan = ""
+	auditPruneForce = false
+	auditPruneDryRun = false
 }
 
 // run executes a tene CLI command and returns stdout, stderr, error.
