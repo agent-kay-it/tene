@@ -153,8 +153,16 @@ func loadApp() (*App, error) {
 	if flagNoKeychain {
 		home, _ := os.UserHomeDir()
 		ks = keychain.NewFileStore(filepath.Join(home, ".tene", "keyfile"))
+		// --no-keychain is an explicit user choice. They do not need a
+		// notice telling them the keychain is unavailable — they asked
+		// for the file fallback. Stay silent.
 	} else {
-		ks = keychain.NewStore(dir)
+		var info keychain.FallbackInfo
+		ks, info = keychain.NewStoreWithStatus(dir)
+		// F6: one-time stderr notice when keychain unavailable and we
+		// silently dropped down to the file keystore. No-op on the
+		// happy path (info.Used == false).
+		emitFallbackNoticeIfNeeded(os.Stderr, info, dir, flagQuiet)
 	}
 
 	env, err := v.GetActiveEnvironment()
