@@ -148,11 +148,49 @@ func rootPersistentPreRunE(cmd *cobra.Command, args []string) error {
 	// does not yet exist, so emitCliAuditRow silently no-ops and init's
 	// RunE writes the F4 row itself once vault.db has been created.
 	// See audit.go header + init.go step 13a.
-	emitCliAuditRow(resolveDir(), auditActionFor(tier, path))
+	dir := resolveDir()
+	emitCliAuditRow(dir, auditActionFor(tier, path))
 
-	// TODO(F8): audit-log size threshold warning hook fires here at the
-	// end of PreRunE (skip on --quiet, sentinel-throttled to 24h).
+	// F8 — audit log size threshold notice. Opens the vault read-only,
+	// checks the audit_log byte estimate against the configured
+	// threshold (default 50 MB, master-plan §11), and emits a one-line
+	// stderr notice at most once per 24h per project. Failure is
+	// silently swallowed — the dispatcher must never block the
+	// command's primary work.
+	//
+	// We use a fresh vault handle (not loadApp()) for the same reason
+	// F4's emitCliAuditRow does: the dispatcher runs BEFORE RunE,
+	// loadApp would unnecessarily probe the keychain, and we only
+	// need read-only SQL access. emitAuditThresholdHook opens the
+	// vault, runs the check, and closes — completely independent of
+	// whatever the verb's RunE does next.
+	emitAuditThresholdHook(dir, flagQuiet)
 	return nil
+}
+
+// emitAuditThresholdHook is the F8 entry point invoked from
+// rootPersistentPreRunE. It exists as a thin wrapper around
+// maybeEmitAuditThresholdWarning so the dispatcher can stay free of
+// vault open/close concerns (mirrors emitCliAuditRow's shape).
+//
+// Why open a fresh vault here rather than thread App through PreRunE:
+// the F2 hook explicitly avoids loadApp() so the dispatcher does not
+// trigger keychain probes for metaread commands. Opening the vault
+// directly (no keychain) keeps that contract while letting F8 read
+// audit_log size + the audit.warnAtMB config row.
+func emitAuditThresholdHook(projectDir string, quiet bool) {
+	vaultPath := filepath.Join(projectDir, ".tene", "vault.db")
+	if _, err := os.Stat(vaultPath); err != nil {
+		// `tene init` path: vault.db not yet present — nothing to
+		// size-check. Same skip logic emitCliAuditRow uses.
+		return
+	}
+	v, err := vault.New(vaultPath)
+	if err != nil {
+		return
+	}
+	defer func() { _ = v.Close() }()
+	maybeEmitAuditThresholdWarning(os.Stderr, v, projectDir, quiet)
 }
 
 // commandTierPath returns the cobra command path normalised to the
