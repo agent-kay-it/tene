@@ -311,6 +311,16 @@ func loadApp() (*App, error) {
 	dir := resolveDir()
 	vaultPath := filepath.Join(dir, ".tene", "vault.db")
 
+	// FX6 B13: distinguish "you pointed at a nonexistent directory"
+	// from "this directory exists but has no vault". Both used to
+	// return ErrVaultNotFound which gave the user the wrong fix
+	// suggestion (run `tene init` here would silently re-create the
+	// wrong path).
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil, teneerr.New("DIR_NOT_FOUND",
+			fmt.Sprintf("Directory %q does not exist.", dir), 1)
+	}
+
 	if _, err := os.Stat(vaultPath); os.IsNotExist(err) {
 		return nil, teneerr.ErrVaultNotFound
 	}

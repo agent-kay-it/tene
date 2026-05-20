@@ -137,15 +137,14 @@ func runEnvList(cmd *cobra.Command, args []string) error {
 	fmt.Println("  Environments:")
 	for _, e := range envs {
 		count, _ := app.Vault.CountSecrets(e.Name)
-		marker := " "
-		active := ""
+		// FX6 B10 + B11: two explicit format strings remove the double
+		// space rc1 produced for non-active envs ("  dev (  0 secrets)")
+		// and pluralise "secret" correctly when the count is 1.
 		if e.IsActive {
-			marker = "*"
-			active = " (active,"
+			fmt.Printf("  * %s (active, %d %s)\n", e.Name, count, pluralize(count, "secret"))
 		} else {
-			active = " ("
+			fmt.Printf("    %s (%d %s)\n", e.Name, count, pluralize(count, "secret"))
 		}
-		fmt.Printf("  %s %s%s %d secrets)\n", marker, e.Name, active, count)
 	}
 	return nil
 }
@@ -249,7 +248,10 @@ func runEnvDelete(cmd *cobra.Command, args []string) error {
 	}
 
 	if !flagQuiet {
-		fmt.Printf("Environment %q deleted (%d secrets removed).\n", envName, secretsRemoved)
+		// FX6 B10: pluralise "secret(s)" so single-secret deletes read
+		// naturally ("1 secret removed" not "1 secrets removed").
+		fmt.Printf("Environment %q deleted (%d %s removed).\n",
+			envName, secretsRemoved, pluralize(secretsRemoved, "secret"))
 	}
 	return nil
 }

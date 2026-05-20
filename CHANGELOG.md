@@ -147,6 +147,30 @@ and tene adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **B7 (MEDIUM): `tene passwd` documentation now explains the
+  TTY-only stance.** The previous "This command requires an interactive
+  terminal." error read like a missing feature; the new `Long`
+  description on `passwdCmd` spells out the deliberate security
+  rationale (forces human-witnessed rotation; closes a CI-driven
+  brute-force vector) (sprint v1014-rc1-qa-fixes, FX6).
+- **B8 (MEDIUM): `tene list --quiet` now honours `--quiet`.** Previously
+  the text-mode output printed the banner, table header, rows, and
+  footer regardless of `--quiet`. The flag's documented meaning is
+  "minimal output (errors only)" — matching `tene set --quiet`. JSON
+  output is unaffected (its consumers need the payload).
+- **B10 (LOW): `1 secrets` plural form fixed** to `1 secret` in
+  `tene env list`, `tene list` footer, and `tene env delete` summary.
+  New `pluralize(count, singular)` helper in `cli/helpers.go`.
+- **B11 (LOW): `(  0 secrets)` double-space** in `tene env list`
+  non-active rows fixed by splitting the format string into two
+  explicit branches (active vs not).
+- **B12 (LOW): `tene config preview.enabled`** (bare form, no
+  `config.` prefix) now resolves to the value instead of returning
+  "unknown config key". The prefixed form is preserved.
+- **B13 (LOW): `tene list --dir /no/such/dir`** now returns a
+  distinct `DIR_NOT_FOUND` error instead of conflating it with the
+  no-vault path, so the recommended fix (`tene init` here vs
+  `cd somewhere/else`) is unambiguous.
 - **B6 (HIGH): `tene run --help` returned "No command specified"** instead
   of help text. The `runCmd` declares `DisableFlagParsing: true` so it can
   forward unknown flags to the child process after `--`; cobra's built-in

@@ -48,6 +48,21 @@ func validateEnvName(name string) error {
 	return nil
 }
 
+// pluralize returns the supplied noun rendered with English plural-s
+// rules: `pluralize(1, "secret") = "secret"`, `pluralize(0|N, "secret")
+// = "secrets"`. Sprint v1014-rc1-qa-fixes / FX6 (B10).
+//
+// Kept deliberately small — we only need this for "secret"/"environment"
+// today, and Go's lack of a stdlib pluraliser does not justify pulling
+// in a dependency. Callers that need irregular plurals can pre-compute
+// the form and pass it in directly.
+func pluralize(count int, singular string) string {
+	if count == 1 {
+		return singular
+	}
+	return singular + "s"
+}
+
 func promptPassword(prompt string) (string, error) {
 	fmt.Fprint(os.Stderr, prompt)
 	password, err := term.ReadPassword(int(os.Stdin.Fd()))
