@@ -147,6 +147,15 @@ and tene adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **B6 (HIGH): `tene run --help` returned "No command specified"** instead
+  of help text. The `runCmd` declares `DisableFlagParsing: true` so it can
+  forward unknown flags to the child process after `--`; cobra's built-in
+  `--help` handler is therefore skipped, and the home-grown
+  `parseFlagsBeforeDash` did not look for help. The new
+  `hasHelpFlag(args)` helper scans pre-`--` tokens for `--help`/`-h` and
+  short-circuits `runRun` to `cmd.Help()`. A guard stops the scan at the
+  first `--` so `tene run -- python -h` still passes `-h` through to the
+  child program (sprint v1014-rc1-qa-fixes, FX5).
 - **B4 (HIGH): `tene help` and `tene help <verb>` returned a dispatch
   error**. The PR #116 permission-tier dispatcher refused to dispatch
   any command without a CommandTier entry, including cobra's synthetic
