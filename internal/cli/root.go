@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/agent-kay-it/tene/internal/auth"
 	"github.com/agent-kay-it/tene/internal/keychain"
 	"github.com/agent-kay-it/tene/internal/vault"
 	teneerr "github.com/agent-kay-it/tene/pkg/errors"
@@ -70,6 +72,76 @@ Resources:
 	Version:       version,
 	SilenceErrors: true,
 	SilenceUsage:  true,
+	// F2 dispatcher: every CLI invocation flows through this hook so the
+	// permission tier of the verb can be inspected centrally. Today the
+	// hook is a guard rail (fails closed for any verb without a tier
+	// declared in internal/auth.CommandTier); F4 will extend it to emit
+	// the cli.<tier>.<verb> audit row, and F8 to fire the audit-log
+	// size threshold warning.
+	PersistentPreRunE: rootPersistentPreRunE,
+}
+
+// rootPersistentPreRunE runs before any subcommand RunE. It enforces the
+// declarative permission tier policy: every verb must have an entry in
+// internal/auth.CommandTier or the dispatch is refused.
+//
+// Why fail closed here even though init() already calls auth.Validate()?
+// init()'s panic catches the static "developer forgot to register a new
+// command" case at binary startup, but cobra also allows runtime
+// AddCommand() (e.g. plugin patterns, or tests that synthesize commands
+// at runtime). The PreRunE check guarantees the invariant on every
+// individual invocation regardless of how the verb got into the tree.
+//
+// F2 deliberately keeps the hook side-effect-free beyond the gate
+// check — actual unlock continues to be each subcommand's responsibility
+// for now, which preserves the existing test suite's ability to drive
+// RunE functions directly (cli_test.go, set_get_test.go, etc.).
+// F4/F8 will add audit and threshold side effects on top.
+func rootPersistentPreRunE(cmd *cobra.Command, args []string) error {
+	path := commandTierPath(cmd)
+	if path == "" {
+		// The bare root invocation (`tene` with no args) prints help; no
+		// tier check is meaningful here. Cobra dispatches to help text
+		// without ever entering a subcommand's RunE.
+		return nil
+	}
+
+	if _, ok := auth.TierFor(path); !ok {
+		// Mirror the wording auth.Validate() uses so an operator sees the
+		// same diagnostic at startup-panic time and at runtime.
+		return fmt.Errorf(
+			"internal: command %q has no PermLevel entry in internal/auth.CommandTier — refusing to dispatch",
+			path,
+		)
+	}
+
+	// TODO(F4): emit cli.<tier>.<verb> audit row here (deferred so the
+	// audit write happens after the subcommand result is known).
+	// TODO(F4/F8): on PermSecretWrite/PermSecretRead, this is also where
+	// a future refactor could centralize loadOrPromptMasterKey — but only
+	// once the existing inline calls in set/get/etc. are migrated in the
+	// same PR to avoid double-prompt regressions.
+	return nil
+}
+
+// commandTierPath returns the cobra command path normalised to the
+// internal/auth.CommandTier key format: the full CommandPath() minus
+// the leading root name. For "tene env list" this returns "env list".
+//
+// Returns the empty string if cmd is the root itself.
+func commandTierPath(cmd *cobra.Command) string {
+	if cmd == nil {
+		return ""
+	}
+	full := cmd.CommandPath()
+	root := cmd.Root().Name()
+	if full == root {
+		return ""
+	}
+	// CommandPath() format: "<root> <child> <grandchild>". Strip the
+	// "<root> " prefix; cobra guarantees a single space separator.
+	prefix := root + " "
+	return strings.TrimPrefix(full, prefix)
 }
 
 func init() {
@@ -109,6 +181,18 @@ func init() {
 	// rootCmd.AddCommand(newSyncCmd())
 	// rootCmd.AddCommand(newBillingCmd())
 	// rootCmd.AddCommand(newTeamCmd())
+
+	// F2 quality gate G4: every registered cobra command must have a
+	// declared PermLevel in internal/auth.CommandTier. Validate() walks
+	// the entire command tree and Refuses to start the binary if any
+	// command is missing — the panic message names the missing paths so
+	// the developer can add them to permissions.go before the next build.
+	//
+	// This is the deliberate "static" half of G4 enforcement; the
+	// "runtime" half lives in rootPersistentPreRunE above.
+	if err := auth.Validate(rootCmd); err != nil {
+		panic(fmt.Sprintf("F2 G4 violation: %v", err))
+	}
 }
 
 // Execute runs the root command.
